@@ -1,0 +1,2 @@
+set solib-search-path E:/Users/Rocky/Documents/workspace/JMCore/obj/local/armeabi
+directory D:/Android/ndk/r7c/platforms/android-5/arch-arm/usr/include eglib D:/Android/ndk/r7c/sources/openssl/include E:/Users/Rocky/Documents/workspace/JMCore/jni D:/Android/ndk/r7c/sources/cxx-stl/system

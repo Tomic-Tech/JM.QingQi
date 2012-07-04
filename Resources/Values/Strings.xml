@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ApplicationName">济南轻骑</string>
+  <string name="SelectedTypes">车型选择</string>
+  <string name="DeviceInfo">设备信息</string>
+  <string name="Model">型号</string>
+  <string name="Version">版本号</string>
+  <string name="DeviceID">设备号</string>
+  <string name="ReadTroubleCode">读取故障码</string>
+  <string name="ClearTroubleCode">清除故障码</string>
+  <string name="ReadLiveData">读取数据流</string>
+  <string name="ActiveTest">执行器测试</string>
+  <string name="Read">读取</string>
+  <string name="Clear">清除</string>
+</resources>
