@@ -52,6 +52,12 @@ namespace JM.QingQi
             protocolFuncs[model]();
         }
 
+        protected override void OnStop()
+        {
+            base.OnStop();
+            DialogManager.Instance.HideDialog();
+        }
+
         private void OnMikuniProtocol()
         {
             string[] arrays = new string[2];
@@ -78,25 +84,44 @@ namespace JM.QingQi
                 }
                 catch (System.IO.IOException ex)
                 {
-                    DialogManager.Instance.FatalDialogShow(
-                        this,
-                        ex.Message,
-                        null
-                    );
+                    RunOnUiThread(() =>
+                    {
+                        DialogManager.Instance.FatalDialogShow(
+                            this,
+                            ex.Message,
+                            null
+                            );
+                    });
                 }
             };
+
             funcs[arrays[1]] = () =>
             {
-                RunOnUiThread(() =>
-                DialogManager.Instance.StatusDialogShow(
-                    this,
-                    ResourceManager.Instance.VehicleDB.GetText("Communicating")
-                )
-                );
-                Mikuni protocol = new Mikuni(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
-                Dictionary<string, string> codes = protocol.ReadHistoryTroubleCode();
-                ShowTroubleCode(codes);
+                try
+                {
+                    RunOnUiThread(() =>
+                        DialogManager.Instance.StatusDialogShow(
+                        this,
+                        ResourceManager.Instance.VehicleDB.GetText("Communicating")
+                        )
+                        );
+                    Mikuni protocol = new Mikuni(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                    Dictionary<string, string> codes = protocol.ReadHistoryTroubleCode();
+                    ShowTroubleCode(codes);
+
+                }
+                catch (System.IO.IOException ex)
+                {
+                    RunOnUiThread(() =>
+                    {
+                        DialogManager.Instance.FatalDialogShow(this,
+                            ex.Message,
+                            null
+                            );
+                    });
+                }
             };
+
             ListView.ItemClick += OnItemClickMikuni;
         }
 

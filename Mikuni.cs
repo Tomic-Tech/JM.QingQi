@@ -575,6 +575,9 @@ namespace JM.QingQi
         public void ReadDataStream(Core.LiveDataVector vec)
         {
             stopReadDataStream = false;
+
+            vec.DeployShowedIndex();
+
             while (!stopReadDataStream)
             {
                 int i = vec.NextShowedIndex();

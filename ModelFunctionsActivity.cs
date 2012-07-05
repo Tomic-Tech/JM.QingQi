@@ -79,7 +79,6 @@ namespace JM.QingQi
                 {
                     RunOnUiThread(() =>
                     {
-                        DialogManager.Instance.HideDialog();
                         Intent intent = new Intent(
                         this,
                         typeof(TroubleCodeActivity)
@@ -146,7 +145,6 @@ namespace JM.QingQi
                         );
                         intent.PutExtra("Model", model);
                         StartActivity(intent);
-                        DialogManager.Instance.HideDialog();
                     }
                     );
                 }
@@ -355,8 +353,10 @@ namespace JM.QingQi
                 {
                     try
                     {
+#if !DEBUG
                         ResourceManager.Instance.Commbox.Close();
                         ResourceManager.Instance.Commbox.Open();
+#endif
                         funcs[((TextView)e.View).Text]();
                     }
                     catch (System.IO.IOException ex)

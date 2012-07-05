@@ -24,8 +24,6 @@ namespace JM.QingQi
         {
             base.OnCreate(bundle);
 
-            ResourceManager.Instance.LiveDataVector.DeployEnabledIndex();
-
             // Create your application here
             ListView.ChoiceMode = ChoiceMode.Multiple;
             ListView.Focusable = false;
@@ -56,18 +54,13 @@ namespace JM.QingQi
 
         }
 
-        void ValueBtnClick(object sender, EventArgs e)
-        {
-            ResourceManager.Instance.LiveDataVector.DeployShowedIndex();
-            Intent intent = new Intent(this, typeof(DataStreamActivity));
-            intent.PutExtra("Model", model);
-            StartActivity(intent);
-        }
-
         protected override void OnStart()
         {
             base.OnStart();
             model = Intent.Extras.GetString("Model");
+
+            ResourceManager.Instance.LiveDataVector.DeployEnabledIndex();
+
             string[] arrays = new string[ResourceManager.Instance.LiveDataVector.EnabledCount];
 
             for (int i = 0; i < arrays.Length; i++)
@@ -82,6 +75,26 @@ namespace JM.QingQi
                 Android.Resource.Layout.SimpleListItemMultipleChoice,
                 arrays
             );
+
+            for (int i = 0; i < ResourceManager.Instance.LiveDataVector.EnabledCount; i++)
+            {
+                int index = ResourceManager.Instance.LiveDataVector.EnabledIndex(i);
+                ListView.SetItemChecked(i, ResourceManager.Instance.LiveDataVector[index].Showed);
+            }
+        }
+
+        protected override void OnStop()
+        {
+            base.OnStop();
+            DialogManager.Instance.HideDialog();
+        }
+
+        void ValueBtnClick(object sender, EventArgs e)
+        {
+            ResourceManager.Instance.LiveDataVector.DeployShowedIndex();
+            Intent intent = new Intent(this, typeof(DataStreamActivity));
+            intent.PutExtra("Model", model);
+            StartActivity(intent);
         }
 
         //public override bool OnKeyDown(Keycode keyCode, KeyEvent e)

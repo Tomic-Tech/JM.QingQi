@@ -84,16 +84,27 @@ namespace JM.QingQi
                 {
                     if (e.PropertyName == "Value")
                     {
-                        OnValueChange(vec[vec.ShowedIndex(i)]);
+                        OnValueChange((Core.LiveData)sender);
                     }
                 };
             }
 
+            DialogManager.Instance.HideDialog();
 
             task = Task.Factory.StartNew(() =>
             {
-                mikuni = new Mikuni(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
-                mikuni.ReadDataStream(ResourceManager.Instance.LiveDataVector);
+                try
+                {
+                    mikuni = new Mikuni(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                    mikuni.ReadDataStream(ResourceManager.Instance.LiveDataVector);
+                }
+                catch (System.IO.IOException ex)
+                {
+                    RunOnUiThread(() =>
+                    {
+                        DialogManager.Instance.FatalDialogShow(this, ex.Message, null);
+                    });
+                }
             });
         }
 
@@ -114,8 +125,10 @@ namespace JM.QingQi
 
         private void OnMikuniBack()
         {
-            mikuni.StopReadDataStream();
-            task.Wait();
+            if (mikuni != null)
+                mikuni.StopReadDataStream();
+            if (task != null)
+                task.Wait();
         }
 
         public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
@@ -123,7 +136,6 @@ namespace JM.QingQi
             if (keyCode == Keycode.Back)
             {
                 backFuncs[model]();
-                return true;
             }
             return base.OnKeyDown(keyCode, e);
         }
