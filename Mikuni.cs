@@ -11,6 +11,7 @@ namespace JM.QingQi
     {
         private Dictionary<int, byte[]> failureCmds;
         private Dictionary<int, DataCalcDelegate> failureCalc;
+        private MikuniOptions options;
 
         public Mikuni(VehicleDB Db, ICommbox commbox)
             : base(Db, commbox)
@@ -35,7 +36,10 @@ namespace JM.QingQi
 
             Pack = new MikuniPack();
 
-            Protocol.Config(null);
+            options = new MikuniOptions();
+            options.Parity = MikuniParity.Even;
+
+            Protocol.Config(options);
         }
 
         private void DataStreamInit()

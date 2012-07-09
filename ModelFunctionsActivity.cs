@@ -353,10 +353,8 @@ namespace JM.QingQi
                 {
                     try
                     {
-#if !DEBUG
                         ResourceManager.Instance.Commbox.Close();
                         ResourceManager.Instance.Commbox.Open();
-#endif
                         funcs[((TextView)e.View).Text]();
                     }
                     catch (System.IO.IOException ex)
