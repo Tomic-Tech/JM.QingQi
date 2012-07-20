@@ -13,7 +13,7 @@ using Android.Widget;
 
 namespace JM.QingQi
 {
-    [Activity(Label = "Active Test")]
+    [Activity(Theme = "@style/Theme.Default", Label = "Active Test")]
     public class ActiveTestActivity : ListActivity
     {
         private delegate void ProtocolFunc();
@@ -72,11 +72,19 @@ namespace JM.QingQi
                 };
                 DialogManager.Instance.ListDialogShow(this, arrays, (sender2, e2) =>
                 {
+                    RunOnUiThread(() => DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Communicating")));
                     Task task = Task.Factory.StartNew(() =>
                     {
-                        Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
-                        string result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Injector"), e2.Which == 0 ? true : false);
-                        RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, result, null));
+                        try
+                        {
+                            Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                            string result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Injector"), e2.Which == 0 ? true : false);
+                            RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, result, null));
+                        }
+                        catch (Exception ex)
+                        {
+                            RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ex.Message, null));
+                        }
                     }
                     );
                 }
@@ -86,16 +94,24 @@ namespace JM.QingQi
             {
                 string[] arrays = new string[]
                 {
-                    ResourceManager.Instance.VehicleDB.GetText("Ingition Coil On Test"),
-                    ResourceManager.Instance.VehicleDB.GetText("Ingition Coil Off Test"),
+                    ResourceManager.Instance.VehicleDB.GetText("Ignition Coil On Test"),
+                    ResourceManager.Instance.VehicleDB.GetText("Ignition Coil Off Test"),
                 };
                 DialogManager.Instance.ListDialogShow(this, arrays, (sender2, e2) =>
                 {
+                    RunOnUiThread(() => DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Communicating")));
                     Task task = Task.Factory.StartNew(() =>
                     {
-                        Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
-                        string result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Ignition Coil"), e2.Which == 0 ? true : false);
-                        RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, result, null));
+                        try
+                        {
+                            Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                            string result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Ignition Coil"), e2.Which == 0 ? true : false);
+                            RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, result, null));
+                        }
+                        catch (Exception ex)
+                        {
+                            RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ex.Message, null));
+                        }
                     }
                     );
                 }
@@ -103,6 +119,7 @@ namespace JM.QingQi
             }
             else if (((TextView)e.View).Text == ResourceManager.Instance.VehicleDB.GetText("Fuel Pump"))
             {
+                RunOnUiThread(() => DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Communicating")));
                 string[] arrays = new string[]
                 {
                     ResourceManager.Instance.VehicleDB.GetText("Fuel Pump On Test"),
@@ -112,9 +129,16 @@ namespace JM.QingQi
                 {
                     Task task = Task.Factory.StartNew(() =>
                     {
-                        Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
-                        string result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Fuel Pump"), e2.Which == 0 ? true : false);
-                        RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, result, null));
+                        try
+                        {
+                            Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                            string result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Fuel Pump"), e2.Which == 0 ? true : false);
+                            RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, result, null));
+                        }
+                        catch (Exception ex)
+                        {
+                            RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ex.Message, null));
+                        }
                     }
                     );
                 }

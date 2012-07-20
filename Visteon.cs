@@ -35,11 +35,12 @@ namespace JM.QingQi
             Protocol = Commbox.CreateProtocol(ProtocolType.ISO9141_2);
 
             if (Protocol == null)
-                throw new IOException();
+                throw new Exception("Not Protocol");
 
             Pack = new ISO9141Pack();
 
-            Protocol.Config(options);
+            if (!Protocol.Config(options))
+                throw new Exception("Protocol Configuration Fail");
         }
 
         private void DataStreamInit()
@@ -74,6 +75,11 @@ namespace JM.QingQi
             DataStreamCalc["ATP"] = (recv =>
             {
                 return string.Format("{0}", recv[2] * 100 / 255);
+            });
+
+            DataStreamCalc["DTC"] = (recv =>
+            {
+                return Core.Utils.CalcStdObdTroubleCode(recv, 0, 0, 2);
             });
         }
 
@@ -114,6 +120,45 @@ namespace JM.QingQi
 
             if (result == null)
                 throw new IOException(Db.GetText("Clear Trouble Code Fail"));
+        }
+
+        public void ReadDataStream(Core.LiveDataVector vec)
+        {
+            stopReadDataStream = false;
+
+            vec.DeployShowedIndex();
+
+            while (!stopReadDataStream)
+            {
+                int i = vec.NextShowedIndex();
+                byte[] cmd = Db.GetCommand(vec[i].CmdID);
+                byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+                if (recv == null)
+                {
+                    i++;
+                    throw new IOException(Db.GetText("Communication Fail"));
+                }
+                // calc
+                vec[i].Value = DataStreamCalc[vec[i].ShortName](recv);
+            }
+        }
+
+        public void ReadFreezeFrame(Core.LiveDataVector vec)
+        {
+            vec.DeployShowedIndex();
+
+            for (int i = 0; i < vec.ShowedCount; i++)
+            {
+                int j = vec.NextShowedIndex();
+                byte[] cmd = Db.GetCommand(vec[i].CmdID);
+                byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+                if (recv == null)
+                {
+                    throw new IOException(Db.GetText("Communication Fail"));
+                }
+                // Cal
+                vec[i].Value = DataStreamCalc[vec[i].ShortName](recv);
+            }
         }
     }
 }

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Threading.Tasks;
+using System.Threading;
 using JM.Core;
 using JM.Diag;
 
@@ -19,40 +21,55 @@ namespace JM.QingQi
         private const byte ShortTermAdjustments = 0x07;
         private const byte LongTermAdjustments = 0x08;
         private readonly byte[] keepLink;
-        private readonly byte[] start;
-        private readonly byte[] stop;
+        private readonly byte[] startCommunication;
+        private readonly byte[] startDiagnosticSession;
+        private readonly byte[] stopDiagnosticSession;
+        private readonly byte[] stopCommunication;
         private KWPOptions options;
 
         public Synerject(Core.VehicleDB Db, ICommbox commbox)
             : base(Db, commbox)
         {
             Db.CMDCatalog = "Synerject";
+            Db.TCCatalog = "Synerject";
+            Db.LDCatalog = "Synerject";
 
             keepLink = Db.GetCommand("KeepLink");
-            start = Db.GetCommand("Start Communication");
-            stop = Db.GetCommand("Stop Communication");
+            startCommunication = Db.GetCommand("Start Communication");
+            startDiagnosticSession = Db.GetCommand("Start DiagnosticSession");
+            stopDiagnosticSession = Db.GetCommand("Stop DiagnosticSession");
+            stopCommunication = Db.GetCommand("Stop Communication");
 
-            ProtocolInit();
             DataStreamInit();
             ActiveTestInit();
+
+            ProtocolInit();
         }
 
         private void ProtocolInit()
         {
             Protocol = Commbox.CreateProtocol(ProtocolType.ISO14230);
             if (Protocol == null)
-                throw new IOException();
-
-            Pack = new KWPPack();
+                throw new Exception("Not Protocol");
 
             options = new KWPOptions();
-            options.Baudrate = 10400;
+            options.Baudrate = 10416;
             options.SourceAddress = TesterID;
             options.TargetAddress = Physical;
             options.MsgMode = KWPMode.Mode8X;
             options.LinkMode = KWPMode.Mode8X;
-            options.FastCmd = Pack.Pack(start, 0, start.Length);
             options.StartType = KWPStartType.Fast;
+            options.ComLine = 7;
+
+            Pack = new KWPPack();
+            Pack.Config(options);
+
+            options.FastCmd = Pack.Pack(startCommunication, 0, startCommunication.Length);
+            if (!Protocol.Config(options))
+                throw new Exception("Protocol Configuration Fail");
+            //Protocol.SetKeepLink(keepLink, 0, keepLink.Length, Pack);
+            //Protocol.KeepLink(true);
+
         }
 
         private void DataStreamInit()
@@ -355,6 +372,10 @@ namespace JM.QingQi
                 {
                     cmd[3] = 0x00;
                 }
+                else
+                {
+                    cmd[3] = 0x01;
+                }
 
                 byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
                 if (recv[0] != 0x7F)
@@ -363,7 +384,7 @@ namespace JM.QingQi
                         return Db.GetText("Injector Off Test Finish");
                     return Db.GetText("Injector On Test Finish");
                 }
-                throw new IOException();
+                throw new IOException(Db.GetText("Active Test Fail"));
             };
 
             ActiveTests[Db.GetText("Ignition Coil")] = (on) =>
@@ -382,7 +403,7 @@ namespace JM.QingQi
                         return Db.GetText("Ignition Coil Off Test Finish");
                     return Db.GetText("Ignition Coil On Test Finish");
                 }
-                throw new IOException();
+                throw new IOException(Db.GetText("Active Test Fail"));
             };
 
             ActiveTests[Db.GetText("Fuel Pump")] = (on) =>
@@ -401,128 +422,152 @@ namespace JM.QingQi
                         return Db.GetText("Fuel Off Test Finish");
                     return Db.GetText("Fuel On Test Finish");
                 }
-                throw new IOException();
+                throw new IOException(Db.GetText("Active Test Fail"));
             };
-        }
-
-        private void StartCommunication()
-        {
-            Protocol.Config(options);
-            Pack.Config(options);
-            Protocol.SetKeepLink(keepLink, 0, keepLink.Length, Pack);
-            Protocol.StartKeepLink(true);
-        }
-
-        private void StopCommunication()
-        {
-            Protocol.SendAndRecv(stop, 0, stop.Length, Pack);
         }
 
         public Dictionary<string, string> ReadTroubleCode()
         {
-            try
+            byte[] cmd = Db.GetCommand("Read DTC By Status");
+            byte[] result = Protocol.SendAndRecv(startDiagnosticSession, 0, startDiagnosticSession.Length, Pack);
+            if (result == null || result[0] != 0x50)
             {
-                StartCommunication();
-
-                byte[] cmd = Db.GetCommand("Read DTC By Status");
-                byte[] result = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
-
-                if (result == null || result[0] != 0x58)
-                {
-                    throw new IOException(Db.GetText("Read Trouble Code Fail"));
-                }
-
-                int dtcNum = Convert.ToInt32(result[1]);
-
-                if (dtcNum == 0)
-                {
-                    throw new IOException(Db.GetText("None Trouble Code"));
-                }
-
-                Dictionary<string, string> tcs = new Dictionary<string, string>();
-
-                for (int i = 0; i < dtcNum; i++)
-                {
-                    string code = Utils.CalcStdObdTroubleCode(result, i, 3, 2);
-                    string content = Db.GetTroubleCode(code);
-                    tcs.Add(code, content);
-                }
-
-                return tcs;
+                throw new IOException(Db.GetText("Read Trouble Code Fail"));
             }
-            catch
+
+            result = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+            Protocol.SendAndRecv(stopDiagnosticSession, 0, stopDiagnosticSession.Length, Pack);
+            Protocol.SendAndRecv(stopCommunication, 0, stopCommunication.Length, Pack);
+
+            if (result == null || result[0] != 0x58)
             {
-                throw;
+                throw new IOException(Db.GetText("Read Trouble Code Fail"));
             }
-            finally
+
+            int dtcNum = Convert.ToInt32(result[1]);
+
+            Dictionary<string, string> tcs = new Dictionary<string, string>();
+
+            if (dtcNum == 0)
             {
-                StopCommunication();
+                throw new IOException(Db.GetText("None Trouble Code"));
             }
+
+            for (int i = 0; i < dtcNum; i++)
+            {
+                string code = Utils.CalcStdObdTroubleCode(result, i, 3, 2);
+                string content = Db.GetTroubleCode(code);
+                tcs.Add(code, content);
+            }
+
+            return tcs;
         }
 
         public void ClearTroubleCode()
         {
-            try
-            {
-                StartCommunication();
+            byte[] cmd = Db.GetCommand("Clear Trouble Code1");
+            byte[] recv = Protocol.SendAndRecv(startDiagnosticSession, 0, startDiagnosticSession.Length, Pack);
 
-                byte[] cmd = Db.GetCommand("Clear Trouble Code");
-                byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
-
-                if (recv == null || recv[0] != 0x54)
-                {
-                    throw new IOException(Db.GetText("Clear Trouble Code Fail"));
-                }
-
-            }
-            catch
+            if (recv == null || recv[0] != 0x50)
             {
-                throw;
+                throw new IOException(Db.GetText("Clear Trouble Code Fail"));
             }
-            finally
+
+            recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+            Protocol.SendAndRecv(stopDiagnosticSession, 0, stopDiagnosticSession.Length, Pack);
+            Protocol.SendAndRecv(stopCommunication, 0, stopCommunication.Length, Pack);
+
+
+            if (recv == null || recv[0] != 0x54)
             {
-                StopCommunication();
+                throw new IOException(Db.GetText("Clear Trouble Code Fail"));
             }
+
         }
 
         public void ReadDataStream(Core.LiveDataVector vec)
         {
-            StartCommunication();
+            byte[] cmd = Db.GetCommand("Read Data By Local Identifier1");
             stopReadDataStream = false;
+
+            byte[] recv = Protocol.SendAndRecv(startDiagnosticSession, 0, startDiagnosticSession.Length, Pack);
+            if (recv == null || recv[0] != 0x50)
+                throw new IOException(Db.GetText("Communication Fail"));
+
+            recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+            if (recv == null)
+            {
+                Protocol.SendAndRecv(stopDiagnosticSession, 0, stopDiagnosticSession.Length, Pack);
+                Protocol.SendAndRecv(stopCommunication, 0, stopCommunication.Length, Pack);
+                throw new IOException(Db.GetText("Communication Fail"));
+            }
+            Task task = Task.Factory.StartNew(() =>
+            {
+                while (!stopReadDataStream)
+                {
+                    Thread.Sleep(50);
+                    Thread.Yield();
+                    recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+                }
+            });
             while (!stopReadDataStream)
             {
                 int i = vec.NextShowedIndex();
-                byte[] cmd = Db.GetCommand(vec[i].CmdID);
-                byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
-                if (recv == null)
-                {
-                    i++;
-                    continue;
-                }
-                // calc
                 vec[i].Value = DataStreamCalc[vec[i].ShortName](recv);
+                Thread.Sleep(10);
+                Thread.Yield();
+                //byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+                //if (recv == null)
+                //    throw new IOException(Db.GetText("Communication Fail"));
+                //for (int i = 0; i < vec.ShowedCount; i++)
+                //{
+                //    int j = vec.NextShowedIndex();
+                //    vec[j].Value = DataStreamCalc[vec[j].ShortName](recv);
+                //}
+                //int i = vec.NextShowedIndex();
+                //if (recv == null)
+                //{
+                //    continue;
+                //}
+                //// calc
+                //vec[i].Value = DataStreamCalc[vec[i].ShortName](recv);
             }
-            StopCommunication();
+            task.Wait();
+            Protocol.SendAndRecv(stopDiagnosticSession, 0, stopDiagnosticSession.Length, Pack);
+            Protocol.SendAndRecv(stopCommunication, 0, stopCommunication.Length, Pack);
         }
 
         public string Active(string mode, bool on)
         {
-            StartCommunication();
+            byte[] buff = Protocol.SendAndRecv(startDiagnosticSession, 0, startDiagnosticSession.Length, Pack);
+
+            if (buff == null || buff[0] != 0x50)
+                throw new IOException(Db.GetText("Active Test Fail"));
+
             string ret = ActiveTests[mode](on);
-            StopCommunication();
+            Protocol.SendAndRecv(stopDiagnosticSession, 0, stopDiagnosticSession.Length, Pack);
+            Protocol.SendAndRecv(stopCommunication, 0, stopCommunication.Length, Pack);
             return ret;
         }
 
         public string ReadECUVersion()
         {
-            StartCommunication();
-
             byte[] cmd = Db.GetCommand("Version");
 
-            byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+            byte[] recv = Protocol.SendAndRecv(startDiagnosticSession, 0, startDiagnosticSession.Length, Pack);
 
-            StopCommunication();
+            if (recv == null || recv[0] != 0x50)
+                throw new IOException(Db.GetText("Read ECU Version Fail"));
 
+            recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+            Protocol.SendAndRecv(stopDiagnosticSession, 0, stopDiagnosticSession.Length, Pack);
+            Protocol.SendAndRecv(stopCommunication, 0, stopCommunication.Length, Pack);
+
+            if (recv == null || recv[0] != 0x61)
+                throw new IOException(Db.GetText("Read ECU Version Fail"));
+
+            recv[0] = 0x20;
+            recv[1] = 0x20;
             return Encoding.ASCII.GetString(recv);
         }
     }

@@ -23,9 +23,10 @@ namespace JM.QingQi
         private Dictionary<string, ProtocolFunc> protocolFuncs;
         private Dictionary<string, ProtocolFunc> backFuncs;
         private string model = null;
-        Mikuni mikuni = null;
-        Synerject synerject = null;
-        TableLayout layout = null;
+        private Mikuni mikuni = null;
+        private Synerject synerject = null;
+        private Visteon visteon = null;
+        private TableLayout layout = null;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -37,22 +38,24 @@ namespace JM.QingQi
             layout.RemoveAllViews();
 
             protocolFuncs = new Dictionary<string, ProtocolFunc>();
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")] = null;
+            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")] = OnSynerjectProtocol;
             protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200GY-F")] = OnMikuniProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250GY")] = null;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250T")] = null;
+            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250GY")] = OnSynerjectProtocol;
+            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250T")] = OnSynerjectProtocol;
             protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200-3D")] = OnMikuniProtocol;
             protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200J-3L")] = OnMikuniProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250J-2L")] = null;
+            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250J-2L")] = OnVisteonProtocol;
+            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250J-2L") + "Freeze"] = OnVisteonFreezeProtocol;
 
             backFuncs = new Dictionary<string, ProtocolFunc>();
-            backFuncs[ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")] = null;
+            backFuncs[ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")] = OnSynerjectBack;
             backFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200GY-F")] = OnMikuniBack;
-            backFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250GY")] = null;
-            backFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250T")] = null;
+            backFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250GY")] = OnSynerjectBack;
+            backFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250T")] = OnSynerjectBack;
             backFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200-3D")] = OnMikuniBack;
             backFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200J-3L")] = OnMikuniBack;
-            backFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250J-2L")] = null;
+            backFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250J-2L")] = OnVisteonBack;
+            backFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250J-2L") + "Freeze"] = OnVisteonFreezeBack;
         }
 
         protected override void OnStart()
@@ -62,7 +65,34 @@ namespace JM.QingQi
             protocolFuncs[model]();
         }
 
-        private void OnMikuniProtocol()
+        public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
+        {
+            if (keyCode == Keycode.Back)
+            {
+                DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+                backFuncs[model]();
+                this.Finish();
+                return true;
+            }
+            return base.OnKeyDown(keyCode, e);
+        }
+
+        private void OnValueChange(Core.LiveData ld)
+        {
+            RunOnUiThread(() =>
+            {
+                Core.LiveDataVector vec = ResourceManager.Instance.LiveDataVector;
+                int position = vec.ShowedPosition(ld.Index);
+
+                TableRow row = (TableRow)layout.GetChildAt(position);
+
+                TextView v = (TextView)row.GetChildAt(1);
+                v.Text = ld.Value;
+            }
+            );
+        }
+
+        private void PreparePage()
         {
             DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
             Core.LiveDataVector vec = ResourceManager.Instance.LiveDataVector;
@@ -90,6 +120,11 @@ namespace JM.QingQi
             }
 
             DialogManager.Instance.HideDialog();
+        }
+
+        private void OnMikuniProtocol()
+        {
+            PreparePage();
 
             task = Task.Factory.StartNew(() =>
             {
@@ -98,7 +133,7 @@ namespace JM.QingQi
                     mikuni = new Mikuni(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
                     mikuni.ReadDataStream(ResourceManager.Instance.LiveDataVector);
                 }
-                catch (System.IO.IOException ex)
+                catch (Exception ex)
                 {
                     RunOnUiThread(() =>
                     {
@@ -106,21 +141,6 @@ namespace JM.QingQi
                     });
                 }
             });
-        }
-
-        private void OnValueChange(Core.LiveData ld)
-        {
-            RunOnUiThread(() =>
-            {
-                Core.LiveDataVector vec = ResourceManager.Instance.LiveDataVector;
-                int position = vec.ShowedPosition(ld.Index);
-
-                TableRow row = (TableRow)layout.GetChildAt(position);
-
-                TextView v = (TextView)row.GetChildAt(1);
-                v.Text = ld.Value;
-            }
-            );
         }
 
         private void OnMikuniBack()
@@ -131,13 +151,89 @@ namespace JM.QingQi
                 task.Wait();
         }
 
-        public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
+        private void OnSynerjectProtocol()
         {
-            if (keyCode == Keycode.Back)
+            PreparePage();
+
+            task = Task.Factory.StartNew(() =>
             {
-                backFuncs[model]();
-            }
-            return base.OnKeyDown(keyCode, e);
+                try
+                {
+                    synerject = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                    synerject.ReadDataStream(ResourceManager.Instance.LiveDataVector);
+                }
+                catch (Exception ex)
+                {
+                    RunOnUiThread(() =>
+                    {
+                        DialogManager.Instance.FatalDialogShow(this, ex.Message, null);
+                    });
+                }
+            });
+        }
+
+        private void OnSynerjectBack()
+        {
+            if (synerject != null)
+                synerject.StopReadDataStream();
+            if (task != null)
+                task.Wait();
+        }
+
+        private void OnVisteonProtocol()
+        {
+            PreparePage();
+
+            task = Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    visteon = new Visteon(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                    visteon.ReadDataStream(ResourceManager.Instance.LiveDataVector);
+                }
+                catch (Exception ex)
+                {
+                    RunOnUiThread(() =>
+                    {
+                        DialogManager.Instance.FatalDialogShow(this, ex.Message, null);
+                    });
+                }
+            });
+        }
+
+        private void OnVisteonBack()
+        {
+            if (visteon != null)
+                visteon.StopReadDataStream();
+            if (task != null)
+                task.Wait();
+        }
+
+        private void OnVisteonFreezeProtocol()
+        {
+            PreparePage();
+
+            task = Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    visteon = new Visteon(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                    visteon.ReadFreezeFrame(ResourceManager.Instance.LiveDataVector);
+                }
+                catch (Exception ex)
+                {
+                    RunOnUiThread(() =>
+                    {
+                        DialogManager.Instance.FatalDialogShow(this, ex.Message, null);
+                    });
+                }
+            });
+        }
+
+        private void OnVisteonFreezeBack()
+        {
+            if (task != null)
+                task.Wait();
         }
     }
 }

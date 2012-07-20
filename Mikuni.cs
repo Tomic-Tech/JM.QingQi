@@ -32,14 +32,19 @@ namespace JM.QingQi
             Protocol = Commbox.CreateProtocol(ProtocolType.MIKUNI);
 
             if (Protocol == null)
-                throw new IOException();
+            {
+                throw new Exception("Not Protocol");
+            }
 
             Pack = new MikuniPack();
 
             options = new MikuniOptions();
             options.Parity = MikuniParity.Even;
 
-            Protocol.Config(options);
+            if (!Protocol.Config(options))
+            {
+                throw new Exception("Protocol Configuration Fail");
+            }
         }
 
         private void DataStreamInit()
@@ -47,66 +52,39 @@ namespace JM.QingQi
             DataStreamCalc = new Dictionary<string, DataCalcDelegate>();
             DataStreamCalc["ER"] = (recv) =>
             {
-                return string.Format(
-                    "{0}",
-                    (Convert.ToUInt16(Encoding.ASCII.GetString(recv)) / 256) * 500
-                );
+                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 256) * 500);
             };
             DataStreamCalc["BV"] = (recv) =>
             {
-                return string.Format(
-                    "{0}",
-                    (Convert.ToUInt16(Encoding.ASCII.GetString(recv)) / 512)
-                );
+                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 512));
             };
             DataStreamCalc["TPS"] = (recv) =>
             {
-                return string.Format(
-                    "{0}",
-                    (Convert.ToUInt16(Encoding.ASCII.GetString(recv)) / 512)
-                );
+                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 512));
             };
             DataStreamCalc["MAT"] = (recv) =>
             {
-                return string.Format(
-                    "{0}",
-                    (Convert.ToUInt16(Encoding.ASCII.GetString(recv)) / 256) - 50
-                );
+                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 256) - 50);
             };
             DataStreamCalc["ET"] = (recv) =>
             {
-                return string.Format(
-                    "{0}",
-                    (Convert.ToUInt16(Encoding.ASCII.GetString(recv)) / 256) - 50
-                );
+                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 256) - 50);
             };
             DataStreamCalc["BP"] = (recv) =>
             {
-                return string.Format(
-                    "{0}",
-                    (Convert.ToUInt16(Encoding.ASCII.GetString(recv)) / 512)
-                );
+                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 512));
             };
             DataStreamCalc["MP"] = (recv) =>
             {
-                return string.Format(
-                    "{0}",
-                    (Convert.ToUInt16(Encoding.ASCII.GetString(recv)) / 512)
-                );
+                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 512));
             };
             DataStreamCalc["IT"] = (recv) =>
             {
-                return string.Format(
-                    "{0}",
-                    (Convert.ToUInt16(Encoding.ASCII.GetString(recv)) / 256) * 15 - 22.5
-                );
+                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 256) * 15 - 22.5);
             };
             DataStreamCalc["IPW"] = (recv) =>
             {
-                return string.Format(
-                    "{0}",
-                    (Convert.ToUInt16(Encoding.ASCII.GetString(recv)) / 2)
-                );
+                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 2));
             };
             DataStreamCalc["TS"] = (recv) =>
             {
@@ -374,12 +352,8 @@ namespace JM.QingQi
         public Dictionary<string, string> ReadCurrentTroubleCode()
         {
             byte[] cmd = Db.GetCommand("Synthetic Failure");
-            byte[] result = Protocol.SendAndRecv(
-                cmd,
-                0,
-                cmd.Length,
-                Pack
-            );
+            byte[] result = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+
             if (result == null)
             {
                 throw new IOException(Db.GetText("Read Trouble Code Fail"));
@@ -390,12 +364,7 @@ namespace JM.QingQi
                 Dictionary<string, string> ret = new Dictionary<string, string>(16);
                 for (int i = 1; i <= 15; i++)
                 {
-                    result = Protocol.SendAndRecv(
-                        failureCmds[i],
-                        0,
-                        failureCmds[i].Length,
-                        Pack
-                    );
+                    result = Protocol.SendAndRecv(failureCmds[i], 0, failureCmds[i].Length, Pack);
                     if (result == null)
                     {
                         throw new IOException(Db.GetText("Read Trouble Code Fail"));
@@ -430,17 +399,11 @@ namespace JM.QingQi
                 string name;
                 if (pointer - i - 1 >= 0)
                 {
-                    name = string.Format(
-                        "Failure History Buffer{0}",
-                        pointer - i - 1
-                    );
+                    name = string.Format("Failure History Buffer{0}", pointer - i - 1);
                 }
                 else
                 {
-                    name = string.Format(
-                        "Failure History Buffer{0}",
-                        pointer + 15 - i
-                    );
+                    name = string.Format("Failure History Buffer{0}", pointer + 15 - i);
                 }
                 cmd = Db.GetCommand(name);
                 result = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
@@ -454,6 +417,10 @@ namespace JM.QingQi
                     string content = Db.GetTroubleCode(code);
                     ret[code] = content;
                 }
+            }
+            if (ret.Count == 0)
+            {
+                throw new IOException(Db.GetText("None Trouble Code"));
             }
             return ret;
         }
@@ -554,10 +521,7 @@ namespace JM.QingQi
 
             for (int i = 1; i < 11; i++)
             {
-                string name = string.Format(
-                    "Long Term Learn Value Zone_{0}",
-                    i
-                );
+                string name = string.Format("Long Term Learn Value Zone_{0}", i);
                 cmd = Db.GetCommand(name);
                 result = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
                 if (result == null || result[0] != '0' || result[1] != '0' || result[2] != '8' || result[3] != '0')
@@ -590,7 +554,7 @@ namespace JM.QingQi
                 if (recv == null)
                 {
                     i++;
-                    continue;
+                    throw new IOException(Db.GetText("Communication Fail"));
                 }
                 // calc
                 vec[i].Value = DataStreamCalc[vec[i].ShortName](recv);

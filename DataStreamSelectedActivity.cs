@@ -26,8 +26,8 @@ namespace JM.QingQi
 
             // Create your application here
             ListView.ChoiceMode = ChoiceMode.Multiple;
-            ListView.Focusable = false;
-            ListView.ItemsCanFocus = false;
+            ListView.Focusable = true;
+            ListView.ItemsCanFocus = true;
             ListView.ItemClick += (sender, e) =>
             {
                 int i = ResourceManager.Instance.LiveDataVector.EnabledIndex(e.Position);
