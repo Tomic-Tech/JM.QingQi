@@ -43,6 +43,9 @@ namespace JM.QingQi
 			// aapt resource value: 0x7f060004
 			public const int buttonDeviceInfo = 2131099652;
 			
+			// aapt resource value: 0x7f060005
+			public const int buttonRts = 2131099653;
+			
 			// aapt resource value: 0x7f060003
 			public const int buttonSelectedTypes = 2131099651;
 			
@@ -55,8 +58,8 @@ namespace JM.QingQi
 			// aapt resource value: 0x7f060000
 			public const int tableLayout = 2131099648;
 			
-			// aapt resource value: 0x7f060005
-			public const int tableLayout1 = 2131099653;
+			// aapt resource value: 0x7f060006
+			public const int tableLayout1 = 2131099654;
 			
 			private Id()
 			{

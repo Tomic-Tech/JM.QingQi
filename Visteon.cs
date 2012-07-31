@@ -40,7 +40,7 @@ namespace JM.QingQi
             Pack = new ISO9141Pack();
 
             if (!Protocol.Config(options))
-                throw new Exception("Protocol Configuration Fail");
+                throw new Exception(Db.GetText("Communication Fail"));
         }
 
         private void DataStreamInit()

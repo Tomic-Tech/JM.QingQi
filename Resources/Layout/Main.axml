@@ -13,4 +13,9 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/buttonDeviceInfo" />
+    <Button
+        android:text="RTS线控制"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonRts" />
 </LinearLayout>

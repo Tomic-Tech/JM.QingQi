@@ -43,7 +43,7 @@ namespace JM.QingQi
 
             if (!Protocol.Config(options))
             {
-                throw new Exception("Protocol Configuration Fail");
+                throw new Exception(Db.GetText("Communication Fail"));
             }
         }
 

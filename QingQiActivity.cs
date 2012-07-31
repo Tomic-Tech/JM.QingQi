@@ -35,6 +35,9 @@ namespace JM.QingQi
             button = FindViewById<Button>(Resource.Id.buttonDeviceInfo);
             button.Click += OnButtonDeviceInfo;
 
+            button = FindViewById<Button>(Resource.Id.buttonRts);
+            button.Click += OnRtsControl;
+
             CopyDatabase();
         }
 
@@ -47,6 +50,23 @@ namespace JM.QingQi
         protected void OnButtonDeviceInfo(object sender, EventArgs e)
         {
             StartActivity(typeof(DevideInfoActivity));
+        }
+
+        protected void OnRtsControl(object sender, EventArgs e)
+        {
+            try
+            {
+                System.IO.Ports.SerialPort p = new System.IO.Ports.SerialPort();
+                p.PortName = System.IO.Ports.SerialPort.GetPortNames()[0];
+                p.Open();
+                bool rts = p.RtsEnable;
+                p.RtsEnable = !rts;
+                Toast.MakeText(this, "RTS " + p.RtsEnable.ToString(), ToastLength.Long);
+            }
+            catch
+            {
+                Toast.MakeText(this, "Open Serial Port Fail", ToastLength.Long);
+            }
         }
 
         private void CreateDirectory()

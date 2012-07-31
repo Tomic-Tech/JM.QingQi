@@ -66,7 +66,7 @@ namespace JM.QingQi
 
             options.FastCmd = Pack.Pack(startCommunication, 0, startCommunication.Length);
             if (!Protocol.Config(options))
-                throw new Exception("Protocol Configuration Fail");
+                throw new Exception(Db.GetText("Communication Fail"));
             //Protocol.SetKeepLink(keepLink, 0, keepLink.Length, Pack);
             //Protocol.KeepLink(true);
 
