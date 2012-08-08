@@ -8,63 +8,30 @@ namespace JM.QingQi
 {
     internal class DialogManager
     {
-        private static readonly DialogManager instance = new DialogManager();
-        private ProgressDialog statusDialog;
-        private AlertDialog fatalDialog;
-        private AlertDialog listDialog;
-
-        private DialogManager()
+        public static ProgressDialog ShowStatus(Context cxt, string msg)
         {
+            ProgressDialog status = new ProgressDialog(cxt);
+            status.SetMessage(msg);
+            status.Show();
+            return status;
         }
 
-        public static DialogManager Instance
+        public static AlertDialog ShowFatal(Context cxt, string msg, EventHandler<DialogClickEventArgs> listener)
         {
-            get { return instance; }
-        }
-
-        public void HideDialog()
-        {
-            if (statusDialog != null)
-                statusDialog.Dismiss();
-            if (fatalDialog != null)
-                fatalDialog.Dismiss();
-            if (listDialog != null)
-                listDialog.Dismiss();
-        }
-
-        public void StatusDialogShow(Context cxt, string msg)
-        {
-            HideDialog();
-            statusDialog = new ProgressDialog(cxt);
-            statusDialog.SetMessage(msg);
-            statusDialog.SetCancelable(false);
-            statusDialog.Show();
-        }
-
-        public void FatalDialogShow(Context cxt, string msg, EventHandler<DialogClickEventArgs> listener)
-        {
-            HideDialog();
-            fatalDialog = new AlertDialog.Builder(cxt).SetMessage(msg).SetPositiveButton(
-                ResourceManager.Instance.VehicleDB.GetText("OK"),
-                listener
-            )
+            AlertDialog fatal = new AlertDialog.Builder(cxt).SetMessage(msg)
+                .SetPositiveButton(ResourceManager.Instance.VehicleDB.GetText("OK"),listener)
                 .Create();
-            fatalDialog.Show();
+            fatal.Show();
+            return fatal;
         }
 
-        public void ListDialogShow(Context cxt, string[] arrays, EventHandler<DialogClickEventArgs> listener)
+        public static AlertDialog ShowList(Context cxt, string[] arrays, EventHandler<DialogClickEventArgs> listener)
         {
-            HideDialog();
-            listDialog = new AlertDialog.Builder(cxt).SetItems(
-                arrays,
-                (IDialogInterfaceOnClickListener)null
-            )
-                .SetPositiveButton(
-                ResourceManager.Instance.VehicleDB.GetText("OK"),
-                listener
-            )
+            AlertDialog list = new AlertDialog.Builder(cxt).SetItems(arrays,(IDialogInterfaceOnClickListener)null)
+                .SetPositiveButton(ResourceManager.Instance.VehicleDB.GetText("OK"), listener)
                 .Create();
-            listDialog.Show();
+            list.Show();
+            return list;
         }
     }
 }

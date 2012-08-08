@@ -86,7 +86,7 @@ namespace JM.QingQi
         protected override void OnStop()
         {
             base.OnStop();
-            DialogManager.Instance.HideDialog();
+            //DialogManager.Instance.HideDialog();
         }
 
         void ValueBtnClick(object sender, EventArgs e)

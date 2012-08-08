@@ -22,7 +22,7 @@ namespace JM.QingQi
 
         private Dictionary<string, ProtocolFunc> protocolFuncs;
         private string model = null;
-        Dictionary<string, ProtocolFunc> funcs;
+        private Dictionary<string, ProtocolFunc> funcs;
 
         public ModelFunctionsActivity()
         {
@@ -51,6 +51,16 @@ namespace JM.QingQi
             ProtocolSelected();
         }
 
+        protected override void OnRestart()
+        {
+            base.OnRestart();
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+        }
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
@@ -68,38 +78,47 @@ namespace JM.QingQi
             arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code"));
             arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Read Data Stream"));
             //            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Activity Test"));
-            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("ECU Version"));
             arrays.Add(ResourceManager.Instance.VehicleDB.GetText("TPS Idle Adjustment"));
             arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Long Term Learn Value Zone Initialization"));
             arrays.Add(ResourceManager.Instance.VehicleDB.GetText("ISC Learn Value Initialize"));
+            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("ECU Version"));
 
             funcs = new Dictionary<string, ProtocolFunc>();
             funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Read Trouble Code"), () =>
             {
-                RunOnUiThread(() =>
-                {
-                    Intent intent = new Intent(this, typeof(TroubleCodeActivity));
-                    intent.PutExtra("Model", model);
-                    StartActivity(intent);
-                }
-                );
+                Intent intent = new Intent(this, typeof(TroubleCodeActivity));
+                intent.PutExtra("Model", model);
+                StartActivity(intent);
             }
             ); // Read Trouble Code
 
             funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code"), () =>
             {
-                try
+                ProgressDialog status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Clearing Trouble Code, Please Wait"));;
+                AlertDialog fatal;
+
+                Task task = Task.Factory.StartNew(() =>
                 {
-                    RunOnUiThread(() => DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Clearing Trouble Code, Please Wait")));
                     Mikuni protocol = new Mikuni(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
                     protocol.ClearTroubleCode();
+                });
 
-                    RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code Finish"), null));
-                }
-                catch (System.IO.IOException ex)
+                task.ContinueWith((t) =>
                 {
-                    RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ex.Message, null));
-                }
+                    RunOnUiThread(() =>
+                    {
+                        status.Dismiss();
+                        if (t.IsFaulted)
+                        {
+                            fatal = DialogManager.ShowFatal(this, t.Exception.InnerException.Message, null);
+                        }
+                        else
+                        {
+                            fatal = DialogManager.ShowFatal(this, ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code Finish"), null);
+                        }
+                    });
+                });
+
             }
             ); // Clear Trouble Code
 
@@ -107,13 +126,9 @@ namespace JM.QingQi
             {
                 ResourceManager.Instance.VehicleDB.LDCatalog = "Mikuni";
                 ResourceManager.Instance.LiveDataVector = ResourceManager.Instance.VehicleDB.GetLiveData();
-                RunOnUiThread(() =>
-                {
-                    Intent intent = new Intent(this, typeof(DataStreamSelectedActivity));
-                    intent.PutExtra("Model", model);
-                    StartActivity(intent);
-                }
-                );
+                Intent intent = new Intent(this, typeof(DataStreamSelectedActivity));
+                intent.PutExtra("Model", model);
+                StartActivity(intent);
             }
             ); // Read Data Stream
 
@@ -125,69 +140,117 @@ namespace JM.QingQi
 
             funcs.Add(ResourceManager.Instance.VehicleDB.GetText("ECU Version"), () =>
             {
-                try
+                ProgressDialog status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Reading ECU Version, Please Wait"));
+                AlertDialog fatal;
+                string version = "";
+                Task task = Task.Factory.StartNew(() =>
                 {
-                    RunOnUiThread(() => DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Reading ECU Version, Please Wait")));
-                    string version = "";
                     Mikuni protocol = new Mikuni(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
                     version = protocol.GetECUVersion();
+                });
 
-                    RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, version, null));
-                }
-                catch (System.IO.IOException ex)
+                task.ContinueWith((t) =>
                 {
-                    RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ex.Message, null));
-                }
+                    RunOnUiThread(() =>
+                    {
+                        status.Dismiss();
+                        if (t.IsFaulted)
+                        {
+                            fatal = DialogManager.ShowFatal(this, t.Exception.InnerException.Message, null);
+                        }
+                        else
+                        {
+                            fatal = DialogManager.ShowFatal(this, version, null);
+                        }
+                    });
+                });
             }
             ); // ECU Version
 
             funcs.Add(ResourceManager.Instance.VehicleDB.GetText("TPS Idle Adjustment"), () =>
             {
-                try
+                ProgressDialog status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+                AlertDialog fatal;
+
+                Task task = Task.Factory.StartNew(() =>
                 {
-                    RunOnUiThread(() => DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Communicating")));
                     Mikuni protocol = new Mikuni(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
                     protocol.TPSIdleSetting();
-                    RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("TPS Idle Setting Success"), null));
-                }
-                catch (System.IO.IOException ex)
+                });
+
+                task.ContinueWith((t) =>
                 {
-                    RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ex.Message, null));
-                }
+                    RunOnUiThread(() =>
+                    {
+                        status.Dismiss();
+                        if (t.IsFaulted)
+                        {
+                            fatal = DialogManager.ShowFatal(this, t.Exception.InnerException.Message, null);
+                        }
+                        else
+                        {
+                            fatal = DialogManager.ShowFatal(this, ResourceManager.Instance.VehicleDB.GetText("TPS Idle Setting Success"), null);
+                        }
+                    });
+                });
             }
             ); // TPS Idle
 
             funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Long Term Learn Value Zone Initialization"), () =>
             {
-                try
+                ProgressDialog status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+                AlertDialog fatal;
+
+                Task task = Task.Factory.StartNew(() =>
                 {
-                    RunOnUiThread(() => DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Communicating")));
                     Mikuni protocol = new Mikuni(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
                     protocol.LongTermLearnValueZoneInitialization();
+                });
 
-                    RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Long Term Learn Value Zone Initialization Success"), null));
-                }
-                catch (System.IO.IOException ex)
+                task.ContinueWith((t) =>
                 {
-                    RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ex.Message, null));
-                }
+                    RunOnUiThread(() =>
+                    {
+                        status.Dismiss();
+                        if (t.IsFaulted)
+                        {
+                            fatal = DialogManager.ShowFatal(this, t.Exception.InnerException.Message, null);
+                        }
+                        else
+                        {
+                            fatal = DialogManager.ShowFatal(this, ResourceManager.Instance.VehicleDB.GetText("Long Term Learn Value Zone Initialization Success"), null);
+                        }
+                    });
+                });
             }
             ); // Long Term
 
             funcs.Add(ResourceManager.Instance.VehicleDB.GetText("ISC Learn Value Initialize"), () =>
             {
-                try
+                ProgressDialog status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+                AlertDialog fatal;
+
+                Task task = Task.Factory.StartNew(() =>
                 {
-                    RunOnUiThread(() => DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Communicating")));
                     Mikuni protocol = new Mikuni(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
                     protocol.ISCLearnValueInitialize();
+                });
 
-                    RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("ISC Learn Value Initialization Success"), null));
-                }
-                catch (System.IO.IOException ex)
+                task.ContinueWith((t) =>
                 {
-                    RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ex.Message, null));
-                }
+                    RunOnUiThread(() =>
+                    {
+                        status.Dismiss();
+                        if (t.IsFaulted)
+                        {
+                            fatal = DialogManager.ShowFatal(this, t.Exception.InnerException.Message, null);
+                        }
+                        else
+                        {
+                            fatal = DialogManager.ShowFatal(this, ResourceManager.Instance.VehicleDB.GetText("ISC Learn Value Initialization Success"), null);
+                        }
+                    });
+                });
             }
             ); // ISC Learn
 
@@ -208,75 +271,88 @@ namespace JM.QingQi
             funcs = new Dictionary<string, ProtocolFunc>();
             funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Read Trouble Code"), () =>
             {
-                RunOnUiThread(() =>
-                {
-                    Intent intent = new Intent(
-                    this,
-                    typeof(TroubleCodeActivity)
-                    );
-                    intent.PutExtra("Model", model);
-                    StartActivity(intent);
-                }
+                Intent intent = new Intent(
+                this,
+                typeof(TroubleCodeActivity)
                 );
+                intent.PutExtra("Model", model);
+                StartActivity(intent);
             }
             );
 
             funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code"), () =>
             {
-                try
+                ProgressDialog status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Clearing Trouble Code, Please Wait"));
+                AlertDialog fatal;
+
+                Task task = Task.Factory.StartNew(() =>
                 {
-                    RunOnUiThread(() => DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Clearing Trouble Code, Please Wait")));
                     Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
                     protocol.ClearTroubleCode();
+                });
 
-                    RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code Finish"), null));
-                }
-                catch (System.IO.IOException ex)
+                task.ContinueWith((t) =>
                 {
-                    RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ex.Message, null));
-                }
+                    RunOnUiThread(() =>
+                    {
+                        status.Dismiss();
+                        if (t.IsFaulted)
+                        {
+                            fatal = DialogManager.ShowFatal(this, t.Exception.InnerException.Message, null);
+                        }
+                        else
+                        {
+                            fatal = DialogManager.ShowFatal(this, ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code Finish"), null);
+                        }
+                    });
+                });
             });
 
             funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Read Data Stream"), () =>
             {
                 ResourceManager.Instance.VehicleDB.LDCatalog = "Synerject";
                 ResourceManager.Instance.LiveDataVector = ResourceManager.Instance.VehicleDB.GetLiveData();
-                RunOnUiThread(() =>
-                {
-                    Intent intent = new Intent(this, typeof(DataStreamSelectedActivity));
-                    intent.PutExtra("Model", model);
-                    StartActivity(intent);
-                }
-                );
+                Intent intent = new Intent(this, typeof(DataStreamSelectedActivity));
+                intent.PutExtra("Model", model);
+                StartActivity(intent);
             }
             ); // Read Data Stream
 
             funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Activity Test"), () =>
             {
-                RunOnUiThread(() =>
-                {
-                    Intent intent = new Intent(this, typeof(ActiveTestActivity));
-                    intent.PutExtra("Model", model);
-                    StartActivity(intent);
-                });
+                Intent intent = new Intent(this, typeof(ActiveTestActivity));
+                intent.PutExtra("Model", model);
+                StartActivity(intent);
             }
             ); // Activity Test
 
             funcs.Add(ResourceManager.Instance.VehicleDB.GetText("ECU Version"), () =>
             {
-                try
+                ProgressDialog status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Reading ECU Version, Please Wait"));
+                AlertDialog fatal;
+                string version = "";
+
+                Task task = Task.Factory.StartNew(() =>
                 {
-                    RunOnUiThread(() => DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Reading ECU Version, Please Wait")));
-                    string version = "";
                     Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
                     version = protocol.ReadECUVersion();
+                });
 
-                    RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, version, null));
-                }
-                catch (System.IO.IOException ex)
+                task.ContinueWith((t) =>
                 {
-                    RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ex.Message, null));
-                }
+                    RunOnUiThread(() =>
+                    {
+                        status.Dismiss();
+                        if (t.IsFaulted)
+                        {
+                            fatal = DialogManager.ShowFatal(this, t.Exception.InnerException.Message, null);
+                        }
+                        else
+                        {
+                            fatal = DialogManager.ShowFatal(this, version, null);
+                        }
+                    });
+                });
             }
             ); // ECU Version
 
@@ -297,46 +373,51 @@ namespace JM.QingQi
             funcs = new Dictionary<string, ProtocolFunc>();
             funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Read Trouble Code"), () =>
             {
-                RunOnUiThread(() =>
-                {
-                    Intent intent = new Intent(
-                    this,
-                    typeof(TroubleCodeActivity)
-                    );
-                    intent.PutExtra("Model", model);
-                    StartActivity(intent);
-                }
+                Intent intent = new Intent(
+                this,
+                typeof(TroubleCodeActivity)
                 );
+                intent.PutExtra("Model", model);
+                StartActivity(intent);
             }
             );
 
             funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code"), () =>
             {
-                try
+                ProgressDialog status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Clearing Trouble Code, Please Wait"));
+                AlertDialog fatal;
+
+                Task task = Task.Factory.StartNew(() =>
                 {
-                    RunOnUiThread(() => DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Clearing Trouble Code, Please Wait")));
                     Visteon protocol = new Visteon(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
                     protocol.ClearTroubleCode();
+                });
 
-                    RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code Finish"), null));
-                }
-                catch (System.IO.IOException ex)
+                task.ContinueWith((t) =>
                 {
-                    RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ex.Message, null));
-                }
+                    RunOnUiThread(() =>
+                    {
+                        status.Dismiss();
+                        if (t.IsFaulted)
+                        {
+                            fatal = DialogManager.ShowFatal(this, t.Exception.InnerException.Message, null);
+                        }
+                        else
+                        {
+                            fatal = DialogManager.ShowFatal(this, ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code Finish"), null);
+                        }
+                    });
+                });
             });
 
             funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Read Data Stream"), () =>
             {
                 ResourceManager.Instance.VehicleDB.LDCatalog = "Visteon";
                 ResourceManager.Instance.LiveDataVector = ResourceManager.Instance.VehicleDB.GetLiveData();
-                RunOnUiThread(() =>
-                {
-                    Intent intent = new Intent(this, typeof(DataStreamSelectedActivity));
-                    intent.PutExtra("Model", model);
-                    StartActivity(intent);
-                }
-                );
+                Intent intent = new Intent(this, typeof(DataStreamSelectedActivity));
+                intent.PutExtra("Model", model);
+                StartActivity(intent);
+
             }
             ); // Read Data Stream
 
@@ -344,12 +425,9 @@ namespace JM.QingQi
             {
                 ResourceManager.Instance.VehicleDB.LDCatalog = "Visteon Freeze";
                 ResourceManager.Instance.LiveDataVector = ResourceManager.Instance.VehicleDB.GetLiveData();
-                RunOnUiThread(() =>
-                {
-                    Intent intent = new Intent(this, typeof(DataStreamActivity));
-                    intent.PutExtra("Model", model + "Freeze");
-                    StartActivity(intent);
-                });
+                Intent intent = new Intent(this, typeof(DataStreamActivity));
+                intent.PutExtra("Model", model + "Freeze");
+                StartActivity(intent);
             }
             ); // Freeze Frame
 
@@ -377,24 +455,33 @@ namespace JM.QingQi
 
         private void OnItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
-            DialogManager.Instance.StatusDialogShow(this, Core.SysDB.GetText("OpenCommbox"));
+            ProgressDialog status = DialogManager.ShowStatus(this, Core.SysDB.GetText("OpenCommbox"));
+            AlertDialog fatal;
+
             Task task = Task.Factory.StartNew(() =>
             {
-                try
+                if (!ResourceManager.Instance.Commbox.Close() ||
+                    !ResourceManager.Instance.Commbox.Open())
                 {
-                    if (!ResourceManager.Instance.Commbox.Close() ||
-                        !ResourceManager.Instance.Commbox.Open())
+                    throw new IOException(Core.SysDB.GetText("Open Commbox Fail"));
+                }
+            });
+
+            task.ContinueWith((t) =>
+            {
+                RunOnUiThread(() =>
+                {
+                    status.Dismiss();
+                    if (t.IsFaulted)
                     {
-                        throw new IOException(Core.SysDB.GetText("Open Commbox Fail"));
+                        fatal = DialogManager.ShowFatal(this, t.Exception.InnerException.Message, null);
                     }
-                    funcs[((TextView)e.View).Text]();
-                }
-                catch (Exception ex)
-                {
-                    RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ex.Message, null));
-                }
-            }
-            );
+                    else
+                    {
+                        funcs[((TextView)e.View).Text]();
+                    }
+                });
+            });
         }
     }
 }

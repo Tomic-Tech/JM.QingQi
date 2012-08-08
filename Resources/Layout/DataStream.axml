@@ -5,11 +5,15 @@
     android:layout_height="fill_parent"
     android:minWidth="25px"
     android:minHeight="25px">
-    <TableLayout
-        android:minWidth="25px"
-        android:minHeight="25px"
-        android:layout_width="fill_parent"
+    <ScrollView
+        android:id="@+id/scrollView01"
         android:layout_height="fill_parent"
-        android:id="@+id/tableLayout">
-    </TableLayout>
+        android:layout_width="fill_parent">
+        <TableLayout
+            android:minWidth="25px"
+            android:minHeight="25px"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/tableLayout" />
+    </ScrollView>
 </LinearLayout>

@@ -35,10 +35,9 @@ namespace JM.QingQi
             button = FindViewById<Button>(Resource.Id.buttonDeviceInfo);
             button.Click += OnButtonDeviceInfo;
 
-            button = FindViewById<Button>(Resource.Id.buttonRts);
-            button.Click += OnRtsControl;
-
             CopyDatabase();
+
+            CreateShortCut(this, Resource.Drawable.Icon, Resource.String.ApplicationName);
         }
 
         protected void OnButtonSelectedTypes(object sender, EventArgs e)
@@ -50,23 +49,6 @@ namespace JM.QingQi
         protected void OnButtonDeviceInfo(object sender, EventArgs e)
         {
             StartActivity(typeof(DevideInfoActivity));
-        }
-
-        protected void OnRtsControl(object sender, EventArgs e)
-        {
-            try
-            {
-                System.IO.Ports.SerialPort p = new System.IO.Ports.SerialPort();
-                p.PortName = System.IO.Ports.SerialPort.GetPortNames()[0];
-                p.Open();
-                bool rts = p.RtsEnable;
-                p.RtsEnable = !rts;
-                Toast.MakeText(this, "RTS " + p.RtsEnable.ToString(), ToastLength.Long);
-            }
-            catch
-            {
-                Toast.MakeText(this, "Open Serial Port Fail", ToastLength.Long);
-            }
         }
 
         private void CreateDirectory()
@@ -172,6 +154,24 @@ namespace JM.QingQi
             Core.MustCallFirst.Instance.Init(sdcardPath + "/");
 
             ResourceManager.Instance.VehicleDB = new Core.VehicleDB(sdcardPath + "/QingQi.db");
+        }
+
+        public static void CreateShortCut(Activity act, int iconResId, int appnameResId)
+        {
+            Intent shortcutintent = new Intent("com.android.launcher.action.INSTALL_SHORTCUT");
+            // 不允许重复创建  
+            shortcutintent.PutExtra("duplicate", false);
+            // 需要现实的名称  
+            shortcutintent.PutExtra(Intent.ExtraShortcutName,
+                    act.GetString(appnameResId));
+            // 快捷图片  
+            Android.Content.Intent.ShortcutIconResource icon = Intent.ShortcutIconResource.FromContext(act.ApplicationContext, iconResId);
+            shortcutintent.PutExtra(Intent.ExtraShortcutIconResource, icon);
+            // 点击快捷图片，运行的程序主入口  
+            shortcutintent.PutExtra(Intent.ExtraShortcutIntent,
+                    new Intent(act.ApplicationContext, act.Class));
+            // 发送广播  
+            act.SendBroadcast(shortcutintent); 
         }
     }
 }

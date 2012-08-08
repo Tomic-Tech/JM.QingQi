@@ -39,8 +39,10 @@ namespace JM.QingQi
 
             Pack = new ISO9141Pack();
 
-            if (!Protocol.Config(options))
-                throw new Exception(Db.GetText("Communication Fail"));
+            if (!Protocol.Config(options) ||
+                !Pack.Config(options))
+                throw new Exception(JM.Core.SysDB.GetText("Communication Fail"));
+
         }
 
         private void DataStreamInit()
@@ -136,7 +138,7 @@ namespace JM.QingQi
                 if (recv == null)
                 {
                     i++;
-                    throw new IOException(Db.GetText("Communication Fail"));
+                    throw new IOException(JM.Core.SysDB.GetText("Communication Fail"));
                 }
                 // calc
                 vec[i].Value = DataStreamCalc[vec[i].ShortName](recv);
@@ -154,7 +156,7 @@ namespace JM.QingQi
                 byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
                 if (recv == null)
                 {
-                    throw new IOException(Db.GetText("Communication Fail"));
+                    throw new IOException(JM.Core.SysDB.GetText("Communication Fail"));
                 }
                 // Cal
                 vec[i].Value = DataStreamCalc[vec[i].ShortName](recv);

@@ -20,6 +20,8 @@ namespace JM.QingQi
 
         private Dictionary<string, ProtocolFunc> protocolFuncs;
         private string model;
+        private ProgressDialog status;
+        private string result = "";
 
         public ActiveTestActivity()
         {
@@ -61,6 +63,22 @@ namespace JM.QingQi
             ListView.ItemClick += OnItemClickSynerject;
         }
 
+        private void ShowResult(Task t)
+        {
+            RunOnUiThread(() =>
+            {
+                status.Dismiss();
+                if (t.IsFaulted)
+                {
+                    DialogManager.ShowFatal(this, t.Exception.InnerException.Message, null);
+                }
+                else
+                {
+                    DialogManager.ShowFatal(this, result, null);
+                }
+            });
+        }
+
         private void OnItemClickSynerject(object sender, AdapterView.ItemClickEventArgs e)
         {
             if (((TextView)e.View).Text == ResourceManager.Instance.VehicleDB.GetText("Injector"))
@@ -70,23 +88,17 @@ namespace JM.QingQi
                     ResourceManager.Instance.VehicleDB.GetText("Injector On Test"),
                     ResourceManager.Instance.VehicleDB.GetText("Injector Off Test"),
                 };
-                DialogManager.Instance.ListDialogShow(this, arrays, (sender2, e2) =>
+                DialogManager.ShowList(this, arrays, (sender2, e2) =>
                 {
-                    RunOnUiThread(() => DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Communicating")));
+                    status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+                    
                     Task task = Task.Factory.StartNew(() =>
                     {
-                        try
-                        {
-                            Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
-                            string result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Injector"), e2.Which == 0 ? true : false);
-                            RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, result, null));
-                        }
-                        catch (Exception ex)
-                        {
-                            RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ex.Message, null));
-                        }
-                    }
-                    );
+                        Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                        result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Injector"), e2.Which == 0 ? true : false);
+                    });
+
+                    task.ContinueWith(ShowResult);
                 }
                 );
             }
@@ -97,50 +109,39 @@ namespace JM.QingQi
                     ResourceManager.Instance.VehicleDB.GetText("Ignition Coil On Test"),
                     ResourceManager.Instance.VehicleDB.GetText("Ignition Coil Off Test"),
                 };
-                DialogManager.Instance.ListDialogShow(this, arrays, (sender2, e2) =>
+                DialogManager.ShowList(this, arrays, (sender2, e2) =>
                 {
-                    RunOnUiThread(() => DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Communicating")));
+                    status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+                    
                     Task task = Task.Factory.StartNew(() =>
                     {
-                        try
-                        {
-                            Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
-                            string result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Ignition Coil"), e2.Which == 0 ? true : false);
-                            RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, result, null));
-                        }
-                        catch (Exception ex)
-                        {
-                            RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ex.Message, null));
-                        }
+                        Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                        result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Ignition Coil"), e2.Which == 0 ? true : false);
                     }
                     );
+                    task.ContinueWith(ShowResult);
                 }
                 );
             }
             else if (((TextView)e.View).Text == ResourceManager.Instance.VehicleDB.GetText("Fuel Pump"))
             {
-                RunOnUiThread(() => DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Communicating")));
+                status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+                
                 string[] arrays = new string[]
                 {
                     ResourceManager.Instance.VehicleDB.GetText("Fuel Pump On Test"),
                     ResourceManager.Instance.VehicleDB.GetText("Fuel Pump Off Test"),
                 };
-                DialogManager.Instance.ListDialogShow(this, arrays, (sender2, e2) =>
+                DialogManager.ShowList(this, arrays, (sender2, e2) =>
                 {
                     Task task = Task.Factory.StartNew(() =>
                     {
-                        try
-                        {
-                            Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
-                            string result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Fuel Pump"), e2.Which == 0 ? true : false);
-                            RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, result, null));
-                        }
-                        catch (Exception ex)
-                        {
-                            RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ex.Message, null));
-                        }
+                        Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                        result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Fuel Pump"), e2.Which == 0 ? true : false);
                     }
                     );
+
+                    task.ContinueWith(ShowResult);
                 }
                 );
             }

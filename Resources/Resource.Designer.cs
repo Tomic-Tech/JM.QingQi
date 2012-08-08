@@ -40,23 +40,23 @@ namespace JM.QingQi
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f060004
-			public const int buttonDeviceInfo = 2131099652;
-			
 			// aapt resource value: 0x7f060005
-			public const int buttonRts = 2131099653;
+			public const int buttonDeviceInfo = 2131099653;
+			
+			// aapt resource value: 0x7f060004
+			public const int buttonSelectedTypes = 2131099652;
 			
 			// aapt resource value: 0x7f060003
-			public const int buttonSelectedTypes = 2131099651;
+			public const int deviceInfoListView = 2131099651;
 			
 			// aapt resource value: 0x7f060002
-			public const int deviceInfoListView = 2131099650;
-			
-			// aapt resource value: 0x7f060001
-			public const int itemList = 2131099649;
+			public const int itemList = 2131099650;
 			
 			// aapt resource value: 0x7f060000
-			public const int tableLayout = 2131099648;
+			public const int scrollView01 = 2131099648;
+			
+			// aapt resource value: 0x7f060001
+			public const int tableLayout = 2131099649;
 			
 			// aapt resource value: 0x7f060006
 			public const int tableLayout1 = 2131099654;

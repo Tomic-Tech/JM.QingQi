@@ -22,7 +22,8 @@ namespace JM.QingQi
         private Dictionary<string, ProtocolFunc> protocolFuncs;
         private Dictionary<string, ProtocolFunc> funcs;
         private string model;
-        private Task troubleCodeTask;
+        Dictionary<string, string> codes = null;
+        ProgressDialog status = null;
 
         public TroubleCodeActivity()
         {
@@ -56,7 +57,6 @@ namespace JM.QingQi
         protected override void OnStop()
         {
             base.OnStop();
-            DialogManager.Instance.HideDialog();
         }
 
         private void OnMikuniProtocol()
@@ -68,43 +68,28 @@ namespace JM.QingQi
             funcs = new Dictionary<string, ProtocolFunc>();
             funcs[arrays[0]] = () =>
             {
-                try
+                status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+                Task task = Task.Factory.StartNew(() =>
                 {
-                    RunOnUiThread(() => DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Communicating")));
                     Mikuni protocol = new Mikuni(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
-                    Dictionary<string, string> codes = protocol.ReadCurrentTroubleCode();
-                    ShowTroubleCode(codes);
-                }
-                catch (Exception ex)
-                {
-                    RunOnUiThread(() =>
-                    {
-                        DialogManager.Instance.FatalDialogShow(this, ex.Message, null);
-                    });
-                }
+                    codes = protocol.ReadCurrentTroubleCode();
+                });
+
+                task.ContinueWith(ShowResult);
             };
 
             funcs[arrays[1]] = () =>
             {
-                try
-                {
-                    RunOnUiThread(() =>
-                    {
-                        DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
-                    }
-                    );
-                    Mikuni protocol = new Mikuni(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
-                    Dictionary<string, string> codes = protocol.ReadHistoryTroubleCode();
-                    ShowTroubleCode(codes);
+                status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+                Dictionary<string, string> codes = null;
 
-                }
-                catch (Exception ex)
+                Task task = Task.Factory.StartNew(() =>
                 {
-                    RunOnUiThread(() =>
-                    {
-                        DialogManager.Instance.FatalDialogShow(this, ex.Message, null);
-                    });
-                }
+                    Mikuni protocol = new Mikuni(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                    codes = protocol.ReadHistoryTroubleCode();
+                });
+
+                task.ContinueWith(ShowResult);
             };
 
             ListView.ItemClick += OnItemClickMikuni;
@@ -112,28 +97,19 @@ namespace JM.QingQi
 
         private void OnItemClickMikuni(object sender, AdapterView.ItemClickEventArgs e)
         {
-            troubleCodeTask = Task.Factory.StartNew(() => funcs[((TextView)e.View).Text]());
+            funcs[((TextView)e.View).Text]();
         }
 
         private void OnSynerject()
         {
-            DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
-            troubleCodeTask = Task.Factory.StartNew(() =>
+            status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+            Task task = Task.Factory.StartNew(() =>
             {
-                try
-                {
-                    Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, ResourceManager.Instance.Commbox);
-                    Dictionary<string, string> codes = protocol.ReadTroubleCode();
-                    ShowTroubleCode(codes);
-                }
-                catch (Exception ex)
-                {
-                    RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ex.Message, (sender, e) =>
-                    {
-                        this.Finish();
-                    }));
-                }
+                Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, ResourceManager.Instance.Commbox);
+                codes = protocol.ReadTroubleCode();
             });
+
+            task.ContinueWith(ShowResult);
         }
 
         private void OnItemClickSynerject(object sender, AdapterView.ItemClickEventArgs e)
@@ -147,23 +123,14 @@ namespace JM.QingQi
 
         private void OnVisteonProtocol()
         {
-            DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
-            troubleCodeTask = Task.Factory.StartNew(() =>
+            status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+            Task task = Task.Factory.StartNew(() =>
             {
-                try
-                {
-                    Visteon protocol = new Visteon(ResourceManager.Instance.VehicleDB, ResourceManager.Instance.Commbox);
-                    Dictionary<string, string> codes = protocol.ReadTroubleCode();
-                    ShowTroubleCode(codes);
-                }
-                catch (Exception ex)
-                {
-                    RunOnUiThread(() => DialogManager.Instance.FatalDialogShow(this, ex.Message, (sender, e) =>
-                    {
-                        this.Finish();
-                    }));
-                }
+                Visteon protocol = new Visteon(ResourceManager.Instance.VehicleDB, ResourceManager.Instance.Commbox);
+                Dictionary<string, string> codes = protocol.ReadTroubleCode();
             });
+
+            task.ContinueWith(ShowResult);
         }
 
         private void OnItemClickVisteon(object sender, AdapterView.ItemClickEventArgs e)
@@ -184,7 +151,7 @@ namespace JM.QingQi
             Toast.MakeText(this, ResourceManager.Instance.VehicleDB.GetText(text.ToString()), ToastLength.Long).Show();
         }
 
-        private void ShowTroubleCode(Dictionary<string, string> codes)
+        private void ShowTroubleCode()
         {
             if (codes == null || codes.Count == 0)
                 return;
@@ -199,11 +166,29 @@ namespace JM.QingQi
             RunOnUiThread(() =>
             {
                 ListView.Adapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, arrays);
-                DialogManager.Instance.HideDialog();
             }
             );
             ListView.ItemClick -= OnItemClickMikuni;
             ListView.ItemClick += OnTroubleCodeItemClick;
+        }
+
+        private void ShowResult(Task t)
+        {
+            RunOnUiThread(() =>
+            {
+                status.Dismiss();
+                if (t.IsFaulted)
+                {
+                    DialogManager.ShowFatal(this, t.Exception.InnerException.Message, (sender, e) =>
+                    {
+                        this.Finish();
+                    });
+                }
+                else
+                {
+                    ShowTroubleCode();
+                }
+            });
         }
     }
 }

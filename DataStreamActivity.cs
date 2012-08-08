@@ -27,6 +27,7 @@ namespace JM.QingQi
         private Synerject synerject = null;
         private Visteon visteon = null;
         private TableLayout layout = null;
+        private ProgressDialog status = null;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -69,7 +70,7 @@ namespace JM.QingQi
         {
             if (keyCode == Keycode.Back)
             {
-                DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+                status = DialogManager.ShowStatus(this, JM.Core.SysDB.GetText("Communicating"));
                 backFuncs[model]();
                 this.Finish();
                 return true;
@@ -94,7 +95,7 @@ namespace JM.QingQi
 
         private void PreparePage()
         {
-            DialogManager.Instance.StatusDialogShow(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+            status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
             Core.LiveDataVector vec = ResourceManager.Instance.LiveDataVector;
             for (int i = 0; i < ResourceManager.Instance.LiveDataVector.ShowedCount; i++)
             {
@@ -119,7 +120,18 @@ namespace JM.QingQi
                 };
             }
 
-            DialogManager.Instance.HideDialog();
+            status.Dismiss();
+        }
+
+        private void ShowFault(Task t)
+        {
+            RunOnUiThread(() =>
+            {
+                if (t.IsFaulted)
+                {
+                    DialogManager.ShowFatal(this, t.Exception.InnerException.Message, null);
+                }
+            });
         }
 
         private void OnMikuniProtocol()
@@ -128,19 +140,11 @@ namespace JM.QingQi
 
             task = Task.Factory.StartNew(() =>
             {
-                try
-                {
-                    mikuni = new Mikuni(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
-                    mikuni.ReadDataStream(ResourceManager.Instance.LiveDataVector);
-                }
-                catch (Exception ex)
-                {
-                    RunOnUiThread(() =>
-                    {
-                        DialogManager.Instance.FatalDialogShow(this, ex.Message, null);
-                    });
-                }
+                mikuni = new Mikuni(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                mikuni.ReadDataStream(ResourceManager.Instance.LiveDataVector);
             });
+
+            task.ContinueWith(ShowFault);
         }
 
         private void OnMikuniBack()
@@ -157,19 +161,11 @@ namespace JM.QingQi
 
             task = Task.Factory.StartNew(() =>
             {
-                try
-                {
-                    synerject = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
-                    synerject.ReadDataStream(ResourceManager.Instance.LiveDataVector);
-                }
-                catch (Exception ex)
-                {
-                    RunOnUiThread(() =>
-                    {
-                        DialogManager.Instance.FatalDialogShow(this, ex.Message, null);
-                    });
-                }
+                synerject = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                synerject.ReadDataStream(ResourceManager.Instance.LiveDataVector);
             });
+
+            task.ContinueWith(ShowFault);
         }
 
         private void OnSynerjectBack()
@@ -186,19 +182,11 @@ namespace JM.QingQi
 
             task = Task.Factory.StartNew(() =>
             {
-                try
-                {
-                    visteon = new Visteon(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
-                    visteon.ReadDataStream(ResourceManager.Instance.LiveDataVector);
-                }
-                catch (Exception ex)
-                {
-                    RunOnUiThread(() =>
-                    {
-                        DialogManager.Instance.FatalDialogShow(this, ex.Message, null);
-                    });
-                }
+                visteon = new Visteon(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                visteon.ReadDataStream(ResourceManager.Instance.LiveDataVector);
             });
+
+            task.ContinueWith(ShowFault);
         }
 
         private void OnVisteonBack()
@@ -211,23 +199,17 @@ namespace JM.QingQi
 
         private void OnVisteonFreezeProtocol()
         {
+            status = DialogManager.ShowStatus(this, JM.Core.SysDB.GetText("Communicating"));
+
             PreparePage();
 
             task = Task.Factory.StartNew(() =>
             {
-                try
-                {
-                    visteon = new Visteon(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
-                    visteon.ReadFreezeFrame(ResourceManager.Instance.LiveDataVector);
-                }
-                catch (Exception ex)
-                {
-                    RunOnUiThread(() =>
-                    {
-                        DialogManager.Instance.FatalDialogShow(this, ex.Message, null);
-                    });
-                }
+                visteon = new Visteon(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                visteon.ReadFreezeFrame(ResourceManager.Instance.LiveDataVector);
             });
+
+            task.ContinueWith(ShowFault);
         }
 
         private void OnVisteonFreezeBack()
