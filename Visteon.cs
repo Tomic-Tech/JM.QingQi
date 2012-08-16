@@ -95,7 +95,7 @@ namespace JM.QingQi
             if (result == null)
                 throw new IOException(Db.GetText("Read Trouble Code Fail"));
 
-            int dtcNum = Convert.ToInt32(result[2] & 0x80);
+            int dtcNum = Convert.ToInt32(result[2] & 0x7F);
             if (dtcNum == 0)
             {
                 throw new IOException(Db.GetText("None Trouble Code"));
@@ -105,10 +105,21 @@ namespace JM.QingQi
             if (result == null)
                 throw new IOException(Db.GetText("Read Trouble Code Fail"));
 
+            List<byte> dtcs = new List<byte>();
+            for (int i = 0; i < result.Length; i++)
+            {
+                if (i % 7 == 0)
+                {
+                    continue;
+                }
+                dtcs.Add(result[i]);
+            }
+
+            result = dtcs.ToArray();
             Dictionary<string, string> codes = new Dictionary<string, string>();
             for (int i = 0; i < dtcNum; i++)
             {
-                string code = Utils.CalcStdObdTroubleCode(result, i, 2, 1);
+                string code = Utils.CalcStdObdTroubleCode(result, i, 2, 0);
                 string content = Db.GetTroubleCode(code);
                 codes.Add(code, content);
             }
@@ -137,11 +148,30 @@ namespace JM.QingQi
                 byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
                 if (recv == null)
                 {
-                    i++;
                     throw new IOException(JM.Core.SysDB.GetText("Communication Fail"));
                 }
                 // calc
                 vec[i].Value = DataStreamCalc[vec[i].ShortName](recv);
+                System.Threading.Thread.Sleep(50);
+            }
+        }
+
+        public void StaticDataStream(Core.LiveDataVector vec)
+        {
+            vec.DeployShowedIndex();
+
+            for (int i = 0; i < vec.ShowedCount; i++)
+            {
+                int index = vec.NextShowedIndex();
+                byte[] cmd = Db.GetCommand(vec[i].CmdID);
+                byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+                if (recv == null)
+                {
+                    throw new IOException(JM.Core.SysDB.GetText("Communication Fail"));
+                }
+                // calc
+                vec[i].Value = DataStreamCalc[vec[i].ShortName](recv);
+                System.Threading.Thread.Sleep(50);
             }
         }
 
@@ -151,15 +181,15 @@ namespace JM.QingQi
 
             for (int i = 0; i < vec.ShowedCount; i++)
             {
-                int j = vec.NextShowedIndex();
-                byte[] cmd = Db.GetCommand(vec[i].CmdID);
+                int index = vec.ShowedIndex(i);
+                byte[] cmd = Db.GetCommand(vec[index].CmdID);
                 byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
                 if (recv == null)
                 {
                     throw new IOException(JM.Core.SysDB.GetText("Communication Fail"));
                 }
                 // Cal
-                vec[i].Value = DataStreamCalc[vec[i].ShortName](recv);
+                vec[index].Value = DataStreamCalc[vec[index].ShortName](recv);
             }
         }
     }

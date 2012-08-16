@@ -66,7 +66,7 @@ namespace JM.QingQi
 
             options.FastCmd = Pack.Pack(startCommunication, 0, startCommunication.Length);
             if (!Protocol.Config(options))
-                throw new Exception(Db.GetText("Communication Fail"));
+                throw new Exception(JM.Core.SysDB.GetText("Communication Fail"));
             //Protocol.SetKeepLink(keepLink, 0, keepLink.Length, Pack);
             //Protocol.KeepLink(true);
 
@@ -76,110 +76,107 @@ namespace JM.QingQi
         {
             DataStreamCalc = new Dictionary<string, DataCalcDelegate>();
 
-            DataStreamCalc["TCC"] = (recv) =>
+            DataStreamCalc["AMP"] = (recv) =>
             {
-                return string.Format("{0}", Convert.ToInt32(recv[6]));
+                return string.Format("{0}", Convert.ToUInt32(recv[2] * 256 + recv[3]));
             };
 
-            DataStreamCalc["EWT"] = (recv) =>
+            DataStreamCalc["CRASH"] = (recv) =>
             {
-                return string.Format("{0}", (recv[11] * 256 + recv[12]) / 12);
+                return string.Format("{0:F4}", Convert.ToDouble(recv[4] * 256 + recv[5]) * 5 / 1024);
             };
 
-            DataStreamCalc["ES"] = (recv) =>
+            DataStreamCalc["CTR_ERR_DYN_NR"] = (recv) =>
             {
-                return string.Format("{0}", recv[45] * 256 + recv[46]);
+                return string.Format("{0}", Convert.ToUInt32(recv[6]));
             };
 
-            DataStreamCalc["BP"] = (recv) =>
+            DataStreamCalc["CUR_IGC_DIAG_cyl1"] = (recv) =>
             {
-                return string.Format("{0}", (recv[2] * 256 + recv[3]) / 10);
+                return string.Format("{0:F4}", Convert.ToDouble(recv[7] * 256 + recv[8]) * 5 / 1024);
             };
 
-            DataStreamCalc["IAT"] = (recv) =>
+            DataStreamCalc["DIST_ACT_MIL"] = (recv) =>
             {
-                return string.Format("{0}", recv[63] - 40);
+                return string.Format("{0}", Convert.ToUInt32(recv[9] * 256 + recv[10]));
             };
 
-            DataStreamCalc["CT"] = (recv) =>
+            DataStreamCalc["ENG_HOUR"] = (recv) =>
             {
-                return string.Format("{0}", recv[55] - 40);
+                //return string.Format("{0}", Convert.ToDouble(recv[10] * 256 + recv[11]) / 12);
+                return string.Format("{0:F4}", Convert.ToDouble(recv[11] * 256 + recv[12]) / 12);
             };
 
-            DataStreamCalc["BV"] = (recv) =>
+            DataStreamCalc["IGA_1"] = (recv) =>
             {
-                return string.Format("{0}", recv[69] / 16 + 4);
+                //return string.Format("{0}", Convert.ToDouble(recv[12]) * 15 / 32  - 30);
+                return string.Format("{0:F4}", Convert.ToDouble(recv[13]) * 15 / 32 - 30);
             };
 
-            DataStreamCalc["ATVPSR"] = (recv) =>
+            DataStreamCalc["IGA_CTR_IS"] = (recv) =>
             {
-                return string.Format("{0}", (recv[65] * 256 + recv[66]) / 512);
+                //return string.Format("{0}", Convert.ToDouble(recv[13]) * 15 / 32 - 30);
+                return string.Format("{0:F4}", Convert.ToDouble(recv[14]) * 15 / 32 - 30);
             };
 
-            DataStreamCalc["EWS"] = (recv) =>
+            DataStreamCalc["INH_IV"] = (recv) =>
             {
-                switch (recv[54])
+                //return string.Format("{0}", Convert.ToUInt32(recv[14]));
+                return string.Format("{0}", Convert.ToUInt32(recv[15]));
+            };
+
+            DataStreamCalc["INJ_MODE"] = (recv) =>
+            {
+                //switch (recv[15])
+                switch (recv[16])
                 {
+                    case 0:
+                        return Db.GetText("Ban");
                     case 1:
-                        return Db.GetText("Stopped");
+                        return Db.GetText("Static");
                     case 2:
-                        return Db.GetText("Started");
+                        return Db.GetText("Early Fuel Injection");
                     case 3:
-                        return Db.GetText("Idle");
+                        return Db.GetText("Early Phase Jet");
                     case 4:
-                        return Db.GetText("Part Load");
+                        return Db.GetText("2 Stoke");
                     case 5:
-                        return Db.GetText("Full");
+                        return Db.GetText("4 Stoke");
                     case 6:
-                        return Db.GetText("Oil Off");
+                        return Db.GetText("4 Stoke Undetermined Phase");
                     default:
                         return "";
                 }
             };
 
-            DataStreamCalc["CLFC"] = (recv) =>
+            DataStreamCalc["ISA_AD_T_DLY"] = (recv) =>
             {
-                return string.Format("{0}", (recv[61] * 256 + recv[62]) / 1024 - 32);
+                return string.Format("{0:F4}", Convert.ToDouble(recv[17]) / 10 - 12.8);
             };
 
-            DataStreamCalc["ATVPSZPSV"] = (recv) =>
+            DataStreamCalc["ISA_ANG_DUR_MEC"] = (recv) =>
             {
-                return string.Format("{0}", ((recv[67] * 256 + recv[68]) * 5) / 1024);
+                return string.Format("{0:F4}", Convert.ToDouble(recv[18] * 256 + recv[19]) * 15 / 32);
             };
 
-            DataStreamCalc["FIT"] = (recv) =>
+            DataStreamCalc["ISA_CTL_IS"] = (recv) =>
             {
-                return string.Format("{0}", (recv[59] * 256 + recv[60]) / 250);
+                return string.Format("{0:F4}", Convert.ToDouble(recv[20]) * 15 / 16 - 120);
             };
 
-            DataStreamCalc["SAA"] = (recv) =>
+            DataStreamCalc["ISC_ISA_AD_MV"] = (recv) =>
             {
-                return string.Format("{0}", (recv[13] * 15) / 32 - 30);
+                return string.Format("{0:F4}", Convert.ToDouble(recv[21]) * 15 / 16 - 120);
             };
 
-            DataStreamCalc["IAMAP"] = (recv) =>
+            DataStreamCalc["LAMB_SP"] = (recv) =>
             {
-                return string.Format("{0}", recv[29] * 256 + recv[30]);
+                return string.Format("{0:F4}", Convert.ToDouble(recv[22]) / 256 + 0.5);
             };
 
-            DataStreamCalc["WFCOZ"] = (recv) =>
+            DataStreamCalc["LV_AFR"] = (recv) =>
             {
-                return string.Format("{0}", recv[15]);
-            };
-
-            DataStreamCalc["LSOV"] = (recv) =>
-            {
-                return string.Format("{0}", (recv[70] * 256 + recv[71]) * 5 / 1024);
-            };
-
-            DataStreamCalc["DTS"] = (recv) =>
-            {
-                return string.Format("{0}", recv[22] * 256 + 0.5);
-            };
-
-            DataStreamCalc["AFRL"] = (recv) =>
-            {
-                if ((recv[23] & 0x80) != 0)
+                if ((recv[23] & 0x01) != 0)
                 {
                     return Db.GetText("Thick");
                 }
@@ -189,9 +186,9 @@ namespace JM.QingQi
                 }
             };
 
-            DataStreamCalc["CLC"] = (recv) =>
+            DataStreamCalc["LV_CELP"] = (recv) =>
             {
-                if ((recv[24] & 0x10) != 0)
+                if ((recv[23] & 0x02) != 0)
                 {
                     return Db.GetText("Yes");
                 }
@@ -201,9 +198,9 @@ namespace JM.QingQi
                 }
             };
 
-            DataStreamCalc["LSH"] = (recv) =>
+            DataStreamCalc["LV_CUT_OUT"] = (recv) =>
             {
-                if ((recv[24] & 0x80) != 0)
+                if ((recv[23] & 0x04) != 0)
                 {
                     return Db.GetText("Yes");
                 }
@@ -213,9 +210,9 @@ namespace JM.QingQi
                 }
             };
 
-            DataStreamCalc["ICR"] = (recv) =>
+            DataStreamCalc["LV_EOL_EFP_PRIM"] = (recv) =>
             {
-                if ((recv[24] & 0x04) != 0)
+                if ((recv[23] & 0x08) != 0)
                 {
                     return Db.GetText("Yes");
                 }
@@ -225,81 +222,19 @@ namespace JM.QingQi
                 }
             };
 
-            DataStreamCalc["FISA"] = (recv) =>
+            DataStreamCalc["LV_EOL_EFP_PRIM_ACT"] = (recv) =>
             {
-                return string.Format("{0}", (recv[51] * 256 + recv[52]) * 15 / 32 - 180);
-            };
-
-            DataStreamCalc["AF"] = (recv) =>
-            {
-                return string.Format("{0}", (recv[25] * 256 + recv[26]) / 64);
-            };
-
-            DataStreamCalc["FI"] = (recv) =>
-            {
-                return string.Format("{0}", (recv[59] * 256 + recv[60]) / 250);
-            };
-
-            DataStreamCalc["FFHR"] = (recv) =>
-            {
-                return string.Format("{0}", recv[43] / 256);
-            };
-
-            DataStreamCalc["TIS"] = (recv) =>
-            {
-                return string.Format("{0}", (recv[49] * 256 + recv[50]) - 32768);
-            };
-
-            DataStreamCalc["MES"] = (recv) =>
-            {
-                return string.Format("{0}", recv[47] * 256 + recv[48]);
-            };
-
-            DataStreamCalc["FPS"] = (recv) =>
-            {
-                switch (recv[53])
+                if ((recv[23] & 0x10) != 0)
                 {
-                    case 1:
-                        return Db.GetText("Close");
-                    case 2:
-                        return Db.GetText("Open");
-                    case 3:
-                        return Db.GetText("The Beginning of the Pump");
-                    default:
-                        return "";
+                    return Db.GetText("Yes");
+                }
+                else
+                {
+                    return Db.GetText("No");
                 }
             };
 
-            DataStreamCalc["ICCT"] = (recv) =>
-            {
-                return string.Format("{0}", (recv[57] * 256 + recv[58]) / 250);
-            };
-
-            DataStreamCalc["TAC"] = (recv) =>
-            {
-                return string.Format("{0}", recv[64] - 40);
-            };
-
-            DataStreamCalc["OIM"] = (recv) =>
-            {
-                switch (recv[16])
-                {
-                    case 1:
-                        return Db.GetText("Ban");
-                    case 2:
-                        return Db.GetText("Static");
-                    case 3:
-                        return Db.GetText("2 Stoke");
-                    case 4:
-                        return Db.GetText("4 Stoke");
-                    case 5:
-                        return Db.GetText("4 Stoke Undetermined Phase");
-                    default:
-                        return "";
-                }
-            };
-
-            DataStreamCalc["DFCF"] = (recv) =>
+            DataStreamCalc["LV_IMMO_PROG"] = (recv) =>
             {
                 if ((recv[23] & 0x20) != 0)
                 {
@@ -311,46 +246,277 @@ namespace JM.QingQi
                 }
             };
 
-            DataStreamCalc["ATUAP"] = (recv) =>
+            DataStreamCalc["LV_IMMO_ECU_PROG"] = (recv) =>
             {
-                return string.Format("{0}", recv[31] * 256 + recv[32]);
-            };
-
-            DataStreamCalc["ATAF"] = (recv) =>
-            {
-                return string.Format("{0}", (recv[27] * 256 + recv[28]) / 64);
-            };
-
-            DataStreamCalc["SM"] = (recv) =>
-            {
-                if ((recv[44] & 0x01) != 0)
+                if ((recv[23] & 0x40) != 0)
                 {
-                    return Db.GetText("Phase");
+                    return Db.GetText("Yes");
                 }
                 else
                 {
-                    return Db.GetText("Undetermined Phase");
+                    return Db.GetText("No");
                 }
             };
 
-            DataStreamCalc["ISAAPICF"] = (recv) =>
+            DataStreamCalc["LV_LOCK_IMOB"] = (recv) =>
             {
-                return string.Format("{0}", (recv[14] * 15) / 32 - 30);
+                if ((recv[23] & 0x80) != 0)
+                {
+                    return Db.GetText("Yes");
+                }
+                else
+                {
+                    return Db.GetText("No");
+                }
             };
 
-            DataStreamCalc["ICPLTECDV"] = (recv) =>
+            DataStreamCalc["LV_LSCL_1"] = (recv) =>
             {
-                return string.Format("{0}", (recv[7] * 256 + recv[8]) * 5 / 1024);
+                if ((recv[24] & 0x01) != 0)
+                {
+                    return Db.GetText("Yes");
+                }
+                else
+                {
+                    return Db.GetText("No");
+                }
             };
 
-            DataStreamCalc["BAFV"] = (recv) =>
+            DataStreamCalc["LV_LSH_UP_1"] = (recv) =>
             {
-                return string.Format("{0}", (recv[4] * 256 + recv[5]) / 1024);
+                if ((recv[24] & 0x02) != 0)
+                {
+                    return Db.GetText("Yes");
+                }
+                else
+                {
+                    return Db.GetText("No");
+                }
             };
 
-            DataStreamCalc["MO"] = (recv) =>
+            DataStreamCalc["LV_REQ_ISC"] = (recv) =>
             {
-                if ((recv[23] & 0x40) != 0)
+                if ((recv[24] & 0x04) != 0)
+                {
+                    return Db.GetText("Yes");
+                }
+                else
+                {
+                    return Db.GetText("No");
+                }
+            };
+
+            DataStreamCalc["LV_VIP"] = (recv) =>
+            {
+                if ((recv[24] & 0x08) != 0)
+                {
+                    return Db.GetText("Yes");
+                }
+                else
+                {
+                    return Db.GetText("No");
+                }
+            };
+
+            DataStreamCalc["LV_EOP"] = (recv) =>
+            {
+                if ((recv[24] & 0x10) != 0)
+                {
+                    return Db.GetText("Yes");
+                }
+                else
+                {
+                    return Db.GetText("No");
+                }
+            };
+
+            DataStreamCalc["MAF"] = (recv) =>
+            {
+                return string.Format("{0:F4}", Convert.ToDouble(recv[25] * 256 + recv[26]) / 64);
+            };
+
+            DataStreamCalc["MAF_THR"] = (recv) =>
+            {
+                return string.Format("{0:F4}", Convert.ToDouble(recv[27] * 256 + recv[28]) / 64);
+            };
+
+            DataStreamCalc["MAP"] = (recv) =>
+            {
+                return string.Format("{0}", Convert.ToUInt32(recv[29] * 256 + recv[30]));
+            };
+
+            DataStreamCalc["MAP_UP"] = (recv) =>
+            {
+                return string.Format("{0}", Convert.ToUInt32(recv[31] * 256 + recv[32]));
+            };
+
+            DataStreamCalc["MFF_AD_ADD_MMV_REL"] = (recv) =>
+            {
+                return string.Format("{0:F4}", Convert.ToDouble(recv[33] * 256 + recv[34]) / 256 - 128);
+            };
+
+            DataStreamCalc["MFF_AD_FAC_MMV_REL"] = (recv) =>
+            {
+                return string.Format("{0:F4}", Convert.ToDouble(recv[35] * 256 + recv[36]) / 1024 - 32);
+            };
+
+            DataStreamCalc["MFF_AD_ADD_MMV"] = (recv) =>
+            {
+                return string.Format("{0:F4}", Convert.ToDouble(recv[37] * 256 + recv[38]) / 256 - 128);
+            };
+
+            DataStreamCalc["MFF_AD_FAC_MMV"] = (recv) =>
+            {
+                return string.Format("{0:F4}", Convert.ToDouble(recv[39] * 256 + recv[40]) / 1024 - 32);
+            };
+
+            DataStreamCalc["MFF_INJ_HOM"] = (recv) =>
+            {
+                return string.Format("{0:F4}", Convert.ToDouble(recv[41] * 256 + recv[42]) / 256);
+            };
+
+            DataStreamCalc["MFF_WUP_COR"] = (recv) =>
+            {
+                return string.Format("{0:F4}", Convert.ToDouble(recv[43]) / 256);
+            };
+
+            DataStreamCalc["MOD_IGA"] = (recv) =>
+            {
+                if (recv[44] == 0)
+                {
+                    return Db.GetText("Undetermined Phase");
+                }
+                else
+                {
+                    return Db.GetText("Phase");
+                }
+            };
+
+            DataStreamCalc["N"] = (recv) => 
+            {
+                return string.Format("{0}", Convert.ToUInt32(recv[45] * 256 + recv[46]));
+            };
+
+            DataStreamCalc["N_MAX_THD"] = (recv) =>
+            {
+                return string.Format("{0}", Convert.ToUInt32(recv[47] * 256 + recv[48]));
+            };
+
+            DataStreamCalc["N_SP_ISC"] = (recv) =>
+            {
+                return string.Format("{0}", Convert.ToInt32(recv[49] * 256 + recv[50]) - 32768);
+            };
+
+            DataStreamCalc["SOI_1"] = (recv) =>
+            {
+                return string.Format("{0:F4}", Convert.ToDouble(recv[51] * 256 + recv[52]) * 15 / 32 - 180);
+            };
+
+            DataStreamCalc["STATE_EFP"] = (recv) =>
+            {
+                if (recv[53] == 0)
+                {
+                    return Db.GetText("Close");
+                }
+                else if (recv[53] == 1)
+                {
+                    return Db.GetText("Open");
+                }
+                else
+                {
+                    return Db.GetText("Prime Pump");
+                }
+            };
+
+            DataStreamCalc["STATE_ENGSTATE"] = (recv) =>
+            {
+                switch (recv[54])
+                {
+                    case 0:
+                        return Db.GetText("Stopped");
+                    case 1:
+                        return Db.GetText("Running");
+                    case 2:
+                        return Db.GetText("Idle");
+                    case 3:
+                        return Db.GetText("Part Load");
+                    case 4:
+                        return Db.GetText("Inverted");
+                    case 5:
+                        return Db.GetText("Inverted - Cut");
+                    default:
+                        return "";
+                }
+            };
+
+            DataStreamCalc["TCO"] = (recv) =>
+            {
+                return string.Format("{0}", Convert.ToInt32(recv[55]) - 40);
+            };
+
+            DataStreamCalc["TCOPWM"] = (recv) =>
+            {
+                return string.Format("{0:F4}", Convert.ToDouble(recv[56]) * 25 / 64);
+            };
+
+            DataStreamCalc["TD_1"] = (recv) =>
+            {
+                return string.Format("{0:F4}", Convert.ToDouble(recv[57] * 256 + recv[58]) * 0.004);
+            };
+
+            DataStreamCalc["TI_HOM_1"] = (recv) =>
+            {
+                return string.Format("{0:F4}", Convert.ToDouble(recv[59] * 256 + recv[60]) * 0.004);
+            };
+
+            DataStreamCalc["TI_LAM_COR"] = (recv) => 
+            {
+                return string.Format("{0:F4}", Convert.ToDouble(recv[61] * 256 + recv[62]) / 1024 - 32);
+            };
+
+            DataStreamCalc["TIA"] = (recv) => 
+            {
+                return string.Format("{0}", Convert.ToInt32(recv[63]) - 40);
+            };
+
+            DataStreamCalc["TIA_CYL"] = (recv) => 
+            {
+                return string.Format("{0}", Convert.ToInt32(recv[64]) - 40);
+            };
+
+            DataStreamCalc["TPS_MTC_1"] = (recv) => 
+            {
+                return string.Format("{0:F4}", Convert.ToDouble(recv[65] * 256 + recv[66]) / 512);
+            };
+
+            DataStreamCalc["V_TPS_AD_BOL_1"] = (recv) => 
+            {
+                return string.Format("{0:F4}", Convert.ToDouble(recv[67] * 256 + recv[68]) * 5 / 1024);
+            };
+
+            DataStreamCalc["VBK_MMV"] = (recv) => 
+            {
+                return string.Format("{0:F4}", Convert.ToDouble(recv[69]) / 16 + 4);
+            };
+
+            DataStreamCalc["VLS_UP_1"] = (recv) => 
+            {
+                return string.Format("{0:F4}", Convert.ToDouble(recv[70] * 256 + recv[71]) * 5 / 1024);
+            };
+
+            DataStreamCalc["VS_8"] = (recv) => 
+            {
+                return string.Format("{0}", Convert.ToUInt32(recv[72]));
+            };
+
+            DataStreamCalc["V_TPS_1_BAS"] = (recv) => 
+            {
+                return string.Format("{0:F4}", Convert.ToDouble(recv[73] * 256 + recv[74] * 5 / 1024));
+            };
+
+            DataStreamCalc["LV_SAV"] = (recv) => 
+            {
+                if (recv[75] == 0)
                 {
                     return Db.GetText("Yes");
                 }
@@ -419,14 +585,14 @@ namespace JM.QingQi
                 if (recv[0] != 0x7F)
                 {
                     if (!on)
-                        return Db.GetText("Fuel Off Test Finish");
-                    return Db.GetText("Fuel On Test Finish");
+                        return Db.GetText("Fuel Pump Off Test Finish");
+                    return Db.GetText("Fuel Pump On Test Finish");
                 }
                 throw new IOException(Db.GetText("Active Test Fail"));
             };
         }
 
-        public Dictionary<string, string> ReadTroubleCode()
+        public Dictionary<string, string> ReadTroubleCode(bool isHistory)
         {
             byte[] cmd = Db.GetCommand("Read DTC By Status");
             byte[] result = Protocol.SendAndRecv(startDiagnosticSession, 0, startDiagnosticSession.Length, Pack);
@@ -455,11 +621,22 @@ namespace JM.QingQi
 
             for (int i = 0; i < dtcNum; i++)
             {
+                if (!isHistory)
+                {
+                    if ((result[i * 3 + 4] & 0x40) == 0)
+                    {
+                        continue;
+                    }
+                }
                 string code = Utils.CalcStdObdTroubleCode(result, i, 3, 2);
                 string content = Db.GetTroubleCode(code);
                 tcs.Add(code, content);
             }
 
+            if (tcs.Count == 0)
+            {
+                throw new IOException(Db.GetText("None Trouble Code"));
+            }
             return tcs;
         }
 
@@ -487,6 +664,7 @@ namespace JM.QingQi
 
         public void ReadDataStream(Core.LiveDataVector vec)
         {
+            vec.DeployShowedIndex();
             byte[] cmd = Db.GetCommand("Read Data By Local Identifier1");
             stopReadDataStream = false;
 
@@ -507,7 +685,11 @@ namespace JM.QingQi
                 {
                     Thread.Sleep(50);
                     Thread.Yield();
-                    recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+                    byte[] temp = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+                    if (temp != null)
+                    {
+                        Array.Copy(temp, recv, recv.Length >= temp.Length ? recv.Length : temp.Length);
+                    }
                 }
             });
             while (!stopReadDataStream)
@@ -535,6 +717,29 @@ namespace JM.QingQi
             task.Wait();
             Protocol.SendAndRecv(stopDiagnosticSession, 0, stopDiagnosticSession.Length, Pack);
             Protocol.SendAndRecv(stopCommunication, 0, stopCommunication.Length, Pack);
+        }
+
+        public void StaticDataStream(Core.LiveDataVector vec)
+        {
+            vec.DeployShowedIndex();
+            byte[] cmd = Db.GetCommand("Read Data By Local Identifier1");
+            byte[] recv = Protocol.SendAndRecv(startDiagnosticSession, 0, startDiagnosticSession.Length, Pack);
+
+            if (recv == null || recv[0] != 0x50)
+                throw new IOException(Core.SysDB.GetText("Communication Fail"));
+
+            recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+            if (recv == null || recv[0] != 0x61)
+                throw new IOException(Core.SysDB.GetText("Communication Fail"));
+
+            Protocol.SendAndRecv(stopDiagnosticSession, 0, stopDiagnosticSession.Length, Pack);
+            Protocol.SendAndRecv(stopCommunication, 0, stopCommunication.Length, Pack);
+
+            for (int i = 0; i < vec.ShowedCount; i++)
+            {
+                int index = vec.ShowedIndex(i);
+                vec[index].Value = DataStreamCalc[vec[index].ShortName](recv);
+            }
         }
 
         public string Active(string mode, bool on)

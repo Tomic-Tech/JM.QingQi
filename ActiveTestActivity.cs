@@ -90,12 +90,17 @@ namespace JM.QingQi
                 };
                 DialogManager.ShowList(this, arrays, (sender2, e2) =>
                 {
+                    if (DialogManager.Which == -1)
+                    {
+                        return;
+                    }
+
                     status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
                     
                     Task task = Task.Factory.StartNew(() =>
                     {
                         Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
-                        result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Injector"), e2.Which == 0 ? true : false);
+                        result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Injector"), DialogManager.Which == 0 ? true : false);
                     });
 
                     task.ContinueWith(ShowResult);
@@ -111,12 +116,17 @@ namespace JM.QingQi
                 };
                 DialogManager.ShowList(this, arrays, (sender2, e2) =>
                 {
+                    if (DialogManager.Which == -1)
+                    {
+                        return;
+                    }
+
                     status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
                     
                     Task task = Task.Factory.StartNew(() =>
                     {
                         Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
-                        result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Ignition Coil"), e2.Which == 0 ? true : false);
+                        result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Ignition Coil"), DialogManager.Which == 0 ? true : false);
                     }
                     );
                     task.ContinueWith(ShowResult);
@@ -124,9 +134,7 @@ namespace JM.QingQi
                 );
             }
             else if (((TextView)e.View).Text == ResourceManager.Instance.VehicleDB.GetText("Fuel Pump"))
-            {
-                status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
-                
+            {   
                 string[] arrays = new string[]
                 {
                     ResourceManager.Instance.VehicleDB.GetText("Fuel Pump On Test"),
@@ -134,10 +142,17 @@ namespace JM.QingQi
                 };
                 DialogManager.ShowList(this, arrays, (sender2, e2) =>
                 {
+                    if (DialogManager.Which == -1)
+                    {
+                        return;
+                    }
+
+                    status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+
                     Task task = Task.Factory.StartNew(() =>
                     {
                         Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
-                        result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Fuel Pump"), e2.Which == 0 ? true : false);
+                        result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Fuel Pump"), DialogManager.Which == 0 ? true : false);
                     }
                     );
 

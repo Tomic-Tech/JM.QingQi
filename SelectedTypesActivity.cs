@@ -21,7 +21,7 @@ namespace JM.QingQi
 
             // Create your application here
             string[] arrays = new string[7];
-            arrays[0] = ResourceManager.Instance.VehicleDB.GetText("QM125T-8H");
+             arrays[0] = ResourceManager.Instance.VehicleDB.GetText("QM125T-8H");
             arrays[1] = ResourceManager.Instance.VehicleDB.GetText("QM200GY-F");
             arrays[2] = ResourceManager.Instance.VehicleDB.GetText("QM250GY");
             arrays[3] = ResourceManager.Instance.VehicleDB.GetText("QM250T");

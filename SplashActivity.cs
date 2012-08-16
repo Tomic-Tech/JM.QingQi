@@ -12,7 +12,7 @@ using Android.Widget;
 
 namespace JM.QingQi
 {
-    [Activity(MainLauncher = true, Theme = "@style/Theme.Splash", NoHistory = true, Icon = "@drawable/icon")]
+    [Activity(MainLauncher = true, Theme = "@style/Theme.Splash", NoHistory = true, Icon = "@drawable/logo")]
     public class SplashActivity : Activity
     {
         protected override void OnCreate(Bundle bundle)

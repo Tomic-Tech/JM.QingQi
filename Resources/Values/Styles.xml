@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <resources>
-  <style name="Theme.Splash" parent="android:Theme">
+  <style name="Theme.Splash" parent="android:Theme.Light">
     <item name="android:windowBackground">@drawable/logo</item>
     <item name="android:windowNoTitle">true</item>
     <item name="android:windowFullscreen">true</item>
   </style>
-  <style name="Theme.Default" parent="android:Theme">
+  <style name="Theme.Default" parent="android:Theme.Light">
     <item name="android:windowNoTitle">true</item>
     <item name="android:windowFullscreen">true</item>
   </style>

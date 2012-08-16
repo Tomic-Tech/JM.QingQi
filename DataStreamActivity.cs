@@ -97,7 +97,7 @@ namespace JM.QingQi
         {
             status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
             Core.LiveDataVector vec = ResourceManager.Instance.LiveDataVector;
-            for (int i = 0; i < ResourceManager.Instance.LiveDataVector.ShowedCount; i++)
+            for (int i = 0; i < vec.ShowedCount; i++)
             {
                 TextView content = new TextView(this);
                 content.Text = vec[vec.ShowedIndex(i)].Content;
@@ -127,15 +127,30 @@ namespace JM.QingQi
         {
             RunOnUiThread(() =>
             {
+                status.Dismiss();
                 if (t.IsFaulted)
                 {
-                    DialogManager.ShowFatal(this, t.Exception.InnerException.Message, null);
+                    try
+                    {
+                        mikuni.StopReadDataStream();
+                        synerject.StopReadDataStream();
+                        visteon.StopReadDataStream();
+                    }
+                    catch
+                    {
+                    }
+                    DialogManager.ShowFatal(this, t.Exception.InnerException.Message, (sender, e) => 
+                    {
+                        this.Finish();
+                    });
                 }
             });
         }
 
         private void OnMikuniProtocol()
         {
+            ResourceManager.Instance.LiveDataVector.DeployEnabledIndex();
+            ResourceManager.Instance.LiveDataVector.DeployShowedIndex();
             PreparePage();
 
             task = Task.Factory.StartNew(() =>
@@ -157,6 +172,79 @@ namespace JM.QingQi
 
         private void OnSynerjectProtocol()
         {
+            Core.LiveDataVector vec = ResourceManager.Instance.LiveDataVector;
+            for (int i = 0; i < vec.Count; i++)
+            {
+                if (model == ResourceManager.Instance.VehicleDB.GetText("QM125T-8H"))
+                {
+                    if ((vec[i].ShortName == "CRASH") ||
+                        (vec[i].ShortName == "DIST_ACT_MIL") ||
+                        (vec[i].ShortName == "ISA_AD_T_DLY") ||
+                        (vec[i].ShortName == "ISA_ANG_DUR_MEC") ||
+                        (vec[i].ShortName == "ISA_CTL_IS") ||
+                        (vec[i].ShortName == "ISC_ISA_AD_MV") ||
+                        (vec[i].ShortName == "LV_EOL_EFP_PRIM") ||
+                        (vec[i].ShortName == "LV_EOL_EFP_PRIM_ACT") ||
+                        (vec[i].ShortName == "LV_IMMO_PROG") ||
+                        (vec[i].ShortName == "LV_IMMO_ECU_PROG") ||
+                        (vec[i].ShortName == "LV_LOCK_IMOB") ||
+                        (vec[i].ShortName == "LV_VIP") ||
+                        (vec[i].ShortName == "LV_EOP") ||
+                        (vec[i].ShortName == "TCOPWM") ||
+                        (vec[i].ShortName == "VS_8") ||
+                        (vec[i].ShortName == "V_TPS_1_BAS") ||
+                        (vec[i].ShortName == "LV_SAV"))
+                    {
+                        vec[i].Enabled = false;
+                    }
+                }
+                else if (model == ResourceManager.Instance.VehicleDB.GetText("QM250GY"))
+                {
+                    if ((vec[i].ShortName == "CRASH") ||
+                        (vec[i].ShortName == "DIST_ACT_MIL") ||
+                        (vec[i].ShortName == "ISA_AD_T_DLY") ||
+                        (vec[i].ShortName == "ISA_ANG_DUR_MEC") ||
+                        (vec[i].ShortName == "ISA_CTL_IS") ||
+                        (vec[i].ShortName == "ISC_ISA_AD_MV") ||
+                        (vec[i].ShortName == "LV_EOL_EFP_PRIM") ||
+                        (vec[i].ShortName == "LV_EOL_EFP_PRIM_ACT") ||
+                        (vec[i].ShortName == "LV_IMMO_PROG") ||
+                        (vec[i].ShortName == "LV_IMMO_ECU_PROG") ||
+                        (vec[i].ShortName == "LV_LOCK_IMOB") ||
+                        (vec[i].ShortName == "LV_VIP") ||
+                        (vec[i].ShortName == "LV_EOP") ||
+                        (vec[i].ShortName == "TCOPWM") ||
+                        (vec[i].ShortName == "VS_8") ||
+                        (vec[i].ShortName == "LV_SAV"))
+                    {
+                        vec[i].Enabled = false;
+                    }
+                }
+                else if (model == ResourceManager.Instance.VehicleDB.GetText("QM250T"))
+                {
+                    if ((vec[i].ShortName == "CRASH") ||
+                        (vec[i].ShortName == "DIST_ACT_MIL") ||
+                        (vec[i].ShortName == "ISA_AD_T_DLY") ||
+                        (vec[i].ShortName == "ISA_ANG_DUR_MEC") ||
+                        (vec[i].ShortName == "ISA_CTL_IS") ||
+                        (vec[i].ShortName == "ISC_ISA_AD_MV") ||
+                        (vec[i].ShortName == "LV_EOL_EFP_PRIM") ||
+                        (vec[i].ShortName == "LV_EOL_EFP_PRIM_ACT") ||
+                        (vec[i].ShortName == "LV_IMMO_PROG") ||
+                        (vec[i].ShortName == "LV_IMMO_ECU_PROG") ||
+                        (vec[i].ShortName == "LV_LOCK_IMOB") ||
+                        (vec[i].ShortName == "LV_VIP") ||
+                        (vec[i].ShortName == "LV_EOP") ||
+                        (vec[i].ShortName == "VS_8") ||
+                        (vec[i].ShortName == "V_TPS_1_BAS") ||
+                        (vec[i].ShortName == "LV_SAV"))
+                    {
+                        vec[i].Enabled = false;
+                    }
+                }
+            }
+            vec.DeployEnabledIndex();
+            vec.DeployShowedIndex();
             PreparePage();
 
             task = Task.Factory.StartNew(() =>
@@ -178,6 +266,8 @@ namespace JM.QingQi
 
         private void OnVisteonProtocol()
         {
+            ResourceManager.Instance.LiveDataVector.DeployEnabledIndex();
+            ResourceManager.Instance.LiveDataVector.DeployShowedIndex();
             PreparePage();
 
             task = Task.Factory.StartNew(() =>
@@ -199,9 +289,9 @@ namespace JM.QingQi
 
         private void OnVisteonFreezeProtocol()
         {
-            status = DialogManager.ShowStatus(this, JM.Core.SysDB.GetText("Communicating"));
-
             PreparePage();
+
+            status = DialogManager.ShowStatus(this, JM.Core.SysDB.GetText("Communicating"));
 
             task = Task.Factory.StartNew(() =>
             {
@@ -214,8 +304,8 @@ namespace JM.QingQi
 
         private void OnVisteonFreezeBack()
         {
-            if (task != null)
-                task.Wait();
+            //if (task != null)
+            //    task.Wait();
         }
     }
 }

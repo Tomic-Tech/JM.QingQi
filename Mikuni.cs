@@ -43,7 +43,7 @@ namespace JM.QingQi
 
             if (!Protocol.Config(options))
             {
-                throw new Exception(Db.GetText("Communication Fail"));
+                throw new Exception(JM.Core.SysDB.GetText("Communication Fail"));
             }
         }
 
@@ -52,7 +52,8 @@ namespace JM.QingQi
             DataStreamCalc = new Dictionary<string, DataCalcDelegate>();
             DataStreamCalc["ER"] = (recv) =>
             {
-                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 256) * 500);
+                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) * 500) / 256);
+                //return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 256) * 500);
             };
             DataStreamCalc["BV"] = (recv) =>
             {
@@ -80,7 +81,8 @@ namespace JM.QingQi
             };
             DataStreamCalc["IT"] = (recv) =>
             {
-                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 256) * 15 - 22.5);
+                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) * 15) / 256 - 22.5);
+                //return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 256) * 15 - 22.5);
             };
             DataStreamCalc["IPW"] = (recv) =>
             {
@@ -99,7 +101,7 @@ namespace JM.QingQi
             };
             DataStreamCalc["ERF"] = (recv) =>
             {
-                if (Convert.ToByte(Encoding.ASCII.GetString(recv)) == 1)
+                if ((Convert.ToUInt16(Encoding.ASCII.GetString(recv)) & 0x0001) == 1)
                 {
                     return Db.GetText("Running");
                 }
@@ -397,9 +399,10 @@ namespace JM.QingQi
             for (int i = 0; i < 16; i++)
             {
                 string name;
-                if (pointer - i - 1 >= 0)
+                int temp = pointer - i - 1;
+                if (temp >= 0)
                 {
-                    name = string.Format("Failure History Buffer{0}", pointer - i - 1);
+                    name = string.Format("Failure History Buffer{0}", temp);
                 }
                 else
                 {
@@ -472,18 +475,19 @@ namespace JM.QingQi
             }
 
             string hex = Encoding.ASCII.GetString(result);
-            StringBuilder ret = new StringBuilder();
+            //StringBuilder ret = new StringBuilder();
 
-            for (int i = 0; i < hex.Length; i += 2)
-            {
-                string e = hex.Substring(i, 2);
-                byte h = Convert.ToByte(e, 16);
-                char c = Convert.ToChar(h);
-                if (Char.IsLetterOrDigit(c))
-                    ret.Append(c);
-            }
+            //for (int i = 0; i < hex.Length; i += 2)
+            //{
+            //    string e = hex.Substring(i, 2);
+            //    byte h = Convert.ToByte(e, 16);
+            //    char c = Convert.ToChar(h);
+            //    if (Char.IsLetterOrDigit(c))
+            //        ret.Append(c);
+            //}
 
-            return ret.ToString();
+            //return ret.ToString();
+            return hex.ToString();
         }
 
         public void TPSIdleSetting()
@@ -554,10 +558,28 @@ namespace JM.QingQi
                 if (recv == null)
                 {
                     i++;
-                    throw new IOException(Db.GetText("Communication Fail"));
+                    throw new IOException(JM.Core.SysDB.GetText("Communication Fail"));
                 }
                 // calc
                 vec[i].Value = DataStreamCalc[vec[i].ShortName](recv);
+            }
+        }
+
+        public void StaticDataStream(Core.LiveDataVector vec)
+        {
+            vec.DeployShowedIndex();
+
+            for (int i = 0; i < vec.ShowedCount; i++)
+            {
+                int index = vec.ShowedIndex(i);
+                byte[] cmd = Db.GetCommand(vec[index].CmdID);
+                byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+                if (recv == null)
+                {
+                    throw new IOException(JM.Core.SysDB.GetText("Communication Fail"));
+                }
+                // calc
+                vec[index].Value = DataStreamCalc[vec[index].ShortName](recv);
             }
         }
     }

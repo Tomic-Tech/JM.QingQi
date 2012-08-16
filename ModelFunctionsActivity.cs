@@ -77,6 +77,7 @@ namespace JM.QingQi
             arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Read Trouble Code"));
             arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code"));
             arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Read Data Stream"));
+            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Static Data Stream"));
             //            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Activity Test"));
             arrays.Add(ResourceManager.Instance.VehicleDB.GetText("TPS Idle Adjustment"));
             arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Long Term Learn Value Zone Initialization"));
@@ -126,11 +127,20 @@ namespace JM.QingQi
             {
                 ResourceManager.Instance.VehicleDB.LDCatalog = "Mikuni";
                 ResourceManager.Instance.LiveDataVector = ResourceManager.Instance.VehicleDB.GetLiveData();
-                Intent intent = new Intent(this, typeof(DataStreamSelectedActivity));
+                Intent intent = new Intent(this, typeof(DataStreamActivity));
                 intent.PutExtra("Model", model);
                 StartActivity(intent);
             }
             ); // Read Data Stream
+
+            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Static Data Stream"), () =>
+            {
+                ResourceManager.Instance.VehicleDB.LDCatalog = "Mikuni";
+                ResourceManager.Instance.LiveDataVector = ResourceManager.Instance.VehicleDB.GetLiveData();
+                Intent intent = new Intent(this, typeof(StaticDataStreamActivity));
+                intent.PutExtra("Model", model);
+                StartActivity(intent);
+            });
 
             funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Activity Test"), () =>
             {
@@ -265,7 +275,9 @@ namespace JM.QingQi
             arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Read Trouble Code"));
             arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code"));
             arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Read Data Stream"));
-            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Activity Test"));
+            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Static Data Stream"));
+            if (model != ResourceManager.Instance.VehicleDB.GetText("QM125T-8H"))
+                arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Activity Test"));
             arrays.Add(ResourceManager.Instance.VehicleDB.GetText("ECU Version"));
 
             funcs = new Dictionary<string, ProtocolFunc>();
@@ -312,11 +324,20 @@ namespace JM.QingQi
             {
                 ResourceManager.Instance.VehicleDB.LDCatalog = "Synerject";
                 ResourceManager.Instance.LiveDataVector = ResourceManager.Instance.VehicleDB.GetLiveData();
-                Intent intent = new Intent(this, typeof(DataStreamSelectedActivity));
+                Intent intent = new Intent(this, typeof(DataStreamActivity));
                 intent.PutExtra("Model", model);
                 StartActivity(intent);
             }
             ); // Read Data Stream
+
+            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Static Data Stream"), () =>
+            {
+                ResourceManager.Instance.VehicleDB.LDCatalog = "Synerject";
+                ResourceManager.Instance.LiveDataVector = ResourceManager.Instance.VehicleDB.GetLiveData();
+                Intent intent = new Intent(this, typeof(StaticDataStreamActivity));
+                intent.PutExtra("Model", model);
+                StartActivity(intent);
+            });
 
             funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Activity Test"), () =>
             {
@@ -366,7 +387,8 @@ namespace JM.QingQi
             arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Read Trouble Code"));
             arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code"));
             arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Read Data Stream"));
-            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Read Freeze Frame"));
+            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Static Data Stream"));
+            //arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Read Freeze Frame"));
             //arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Activity Test"));
             //arrays.Add(ResourceManager.Instance.VehicleDB.GetText("ECU Version"));
 
@@ -414,12 +436,21 @@ namespace JM.QingQi
             {
                 ResourceManager.Instance.VehicleDB.LDCatalog = "Visteon";
                 ResourceManager.Instance.LiveDataVector = ResourceManager.Instance.VehicleDB.GetLiveData();
-                Intent intent = new Intent(this, typeof(DataStreamSelectedActivity));
+                Intent intent = new Intent(this, typeof(DataStreamActivity));
                 intent.PutExtra("Model", model);
                 StartActivity(intent);
 
             }
             ); // Read Data Stream
+
+            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Static Data Stream"), () =>
+            {
+                ResourceManager.Instance.VehicleDB.LDCatalog = "Visteon";
+                ResourceManager.Instance.LiveDataVector = ResourceManager.Instance.VehicleDB.GetLiveData();
+                Intent intent = new Intent(this, typeof(StaticDataStreamActivity));
+                intent.PutExtra("Model", model);
+                StartActivity(intent);
+            });
 
             funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Read Freeze Frame"), () =>
             {

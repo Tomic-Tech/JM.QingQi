@@ -27,11 +27,22 @@ namespace JM.QingQi
 
         public static AlertDialog ShowList(Context cxt, string[] arrays, EventHandler<DialogClickEventArgs> listener)
         {
-            AlertDialog list = new AlertDialog.Builder(cxt).SetItems(arrays,(IDialogInterfaceOnClickListener)null)
+            Which = -1;
+            AlertDialog list = new AlertDialog.Builder(cxt).SetSingleChoiceItems(arrays, -1, (dialog, w) =>
+            {
+                which = w.Which;
+            })
                 .SetPositiveButton(ResourceManager.Instance.VehicleDB.GetText("OK"), listener)
                 .Create();
             list.Show();
             return list;
+        }
+
+        private static int which;
+        public static int Which
+        {
+            get { return which; }
+            private set { which = value; }
         }
     }
 }

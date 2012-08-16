@@ -37,7 +37,7 @@ namespace JM.QingQi
 
             CopyDatabase();
 
-            CreateShortCut(this, Resource.Drawable.Icon, Resource.String.ApplicationName);
+            //CreateShortCut(this, Resource.Drawable.Icon, Resource.String.ApplicationName);
         }
 
         protected void OnButtonSelectedTypes(object sender, EventArgs e)
@@ -160,7 +160,7 @@ namespace JM.QingQi
         {
             Intent shortcutintent = new Intent("com.android.launcher.action.INSTALL_SHORTCUT");
             // 不允许重复创建  
-            shortcutintent.PutExtra("duplicate", false);
+            shortcutintent.PutExtra("duplicate", true);
             // 需要现实的名称  
             shortcutintent.PutExtra(Intent.ExtraShortcutName,
                     act.GetString(appnameResId));
