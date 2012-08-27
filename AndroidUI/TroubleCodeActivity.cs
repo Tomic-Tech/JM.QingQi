@@ -12,7 +12,9 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 
-namespace JM.QingQi
+using JM.QingQi.Vehicle;
+
+namespace JM.QingQi.AndroidUI
 {
     [Activity(Theme = "@style/Theme.Default", Label = "Trouble Code")]
     public class TroubleCodeActivity : ListActivity

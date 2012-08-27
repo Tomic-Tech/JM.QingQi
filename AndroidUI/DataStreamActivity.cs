@@ -12,7 +12,9 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 
-namespace JM.QingQi
+using JM.QingQi.Vehicle;
+
+namespace JM.QingQi.AndroidUI
 {
     [Activity(Theme = "@style/Theme.Default", Label = "Data Stream")]
     public class DataStreamActivity : Activity
@@ -211,6 +213,7 @@ namespace JM.QingQi
                         (vec[i].ShortName == "LV_IMMO_PROG") ||
                         (vec[i].ShortName == "LV_IMMO_ECU_PROG") ||
                         (vec[i].ShortName == "LV_LOCK_IMOB") ||
+                        (vec[i].ShortName == "LV_LSH_UP_1") ||
                         (vec[i].ShortName == "LV_VIP") ||
                         (vec[i].ShortName == "LV_EOP") ||
                         (vec[i].ShortName == "TCOPWM") ||
@@ -233,6 +236,7 @@ namespace JM.QingQi
                         (vec[i].ShortName == "LV_IMMO_PROG") ||
                         (vec[i].ShortName == "LV_IMMO_ECU_PROG") ||
                         (vec[i].ShortName == "LV_LOCK_IMOB") ||
+                        (vec[i].ShortName == "LV_LSH_UP_1") ||
                         (vec[i].ShortName == "LV_VIP") ||
                         (vec[i].ShortName == "LV_EOP") ||
                         (vec[i].ShortName == "VS_8") ||

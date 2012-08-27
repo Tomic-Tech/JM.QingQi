@@ -5,7 +5,7 @@ using System.Text;
 using JM.Core;
 using JM.Diag;
 
-namespace JM.QingQi
+namespace JM.QingQi.Vehicle
 {
     internal class Mikuni : AbstractECU
     {

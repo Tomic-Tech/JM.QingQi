@@ -10,7 +10,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 
-namespace JM.QingQi
+namespace JM.QingQi.AndroidUI
 {
     public class BootBroadcastReceiver : BroadcastReceiver
     {

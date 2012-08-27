@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace JM.QingQi
+namespace JM.QingQi.Vehicle
 {
     internal class ResourceManager
     {

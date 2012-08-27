@@ -10,7 +10,9 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 
-namespace JM.QingQi
+using JM.QingQi.Vehicle;
+
+namespace JM.QingQi.AndroidUI
 {
     [Activity(Theme = "@style/Theme.Default", Label = "Detail Data Stream Activity")]
     public class DetailDataStreamActivity : ListActivity

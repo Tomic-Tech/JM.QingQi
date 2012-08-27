@@ -10,7 +10,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 
-namespace JM.QingQi
+namespace JM.QingQi.AndroidUI
 {
     [Activity(MainLauncher = true, Theme = "@style/Theme.Splash", NoHistory = true, Icon = "@drawable/logo")]
     public class SplashActivity : Activity

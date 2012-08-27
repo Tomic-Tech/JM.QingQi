@@ -10,7 +10,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 
-namespace JM.QingQi
+namespace JM.QingQi.AndroidUI
 {
     [Activity(Theme = "@style/Theme.Default", Label = "Device Information")]
     public class DevideInfoActivity : Activity

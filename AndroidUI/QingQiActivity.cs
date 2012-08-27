@@ -8,7 +8,9 @@ using Android.Views;
 using Android.Widget;
 using Android.OS;
 
-namespace JM.QingQi
+using JM.QingQi.Vehicle;
+
+namespace JM.QingQi.AndroidUI
 {
     [Activity(Theme = "@style/Theme.Default", Label = "JiNanQingQi")]
     public class QingQiActivity : Activity

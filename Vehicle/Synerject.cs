@@ -7,7 +7,7 @@ using System.Threading;
 using JM.Core;
 using JM.Diag;
 
-namespace JM.QingQi
+namespace JM.QingQi.Vehicle
 {
     internal class Synerject : AbstractECU
     {
@@ -122,7 +122,15 @@ namespace JM.QingQi
             DataStreamCalc["INH_IV"] = (recv) =>
             {
                 //return string.Format("{0}", Convert.ToUInt32(recv[14]));
-                return string.Format("{0}", Convert.ToUInt32(recv[15]));
+                //return string.Format("{0}", Convert.ToUInt32(recv[15]));
+                if ((recv[15] & 0x01) == 0)
+                {
+                    return Db.GetText("Fuel - Cut");
+                }
+                else
+                {
+                    return Db.GetText("Fuel - Not Cut");
+                }
             };
 
             DataStreamCalc["INJ_MODE"] = (recv) =>
@@ -202,11 +210,11 @@ namespace JM.QingQi
             {
                 if ((recv[23] & 0x04) != 0)
                 {
-                    return Db.GetText("Yes");
+                    return Db.GetText("Oil - Cut");
                 }
                 else
                 {
-                    return Db.GetText("No");
+                    return Db.GetText("Oil - Not Cut");
                 }
             };
 
@@ -298,11 +306,11 @@ namespace JM.QingQi
             {
                 if ((recv[24] & 0x04) != 0)
                 {
-                    return Db.GetText("Yes");
+                    return Db.GetText("Idle Controlling");
                 }
                 else
                 {
-                    return Db.GetText("No");
+                    return Db.GetText("Idle Not Controlling");
                 }
             };
 

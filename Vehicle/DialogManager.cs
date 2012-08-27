@@ -4,7 +4,7 @@ using System.Text;
 using Android.App;
 using Android.Content;
 
-namespace JM.QingQi
+namespace JM.QingQi.Vehicle
 {
     internal class DialogManager
     {

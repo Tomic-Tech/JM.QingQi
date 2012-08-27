@@ -6,7 +6,7 @@ using System.IO;
 using JM.Core;
 using JM.Diag;
 
-namespace JM.QingQi
+namespace JM.QingQi.Vehicle
 {
     internal class Visteon : AbstractECU
     {
