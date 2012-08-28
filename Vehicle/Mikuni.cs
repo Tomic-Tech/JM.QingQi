@@ -351,7 +351,7 @@ namespace JM.QingQi.Vehicle
             });
         }
 
-        public Dictionary<string, string> ReadCurrentTroubleCode()
+        public List<TroubleCode> ReadCurrentTroubleCode()
         {
             byte[] cmd = Db.GetCommand("Synthetic Failure");
             byte[] result = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
@@ -363,7 +363,7 @@ namespace JM.QingQi.Vehicle
 
             if (result[0] != 0x30 || result[1] != 0x30 || result[2] != 0x30 || result[3] != 0x30)
             {
-                Dictionary<string, string> ret = new Dictionary<string, string>(16);
+                List<TroubleCode> ret = new List<TroubleCode>();
                 for (int i = 1; i <= 15; i++)
                 {
                     result = Protocol.SendAndRecv(failureCmds[i], 0, failureCmds[i].Length, Pack);
@@ -376,7 +376,7 @@ namespace JM.QingQi.Vehicle
                     {
                         string code = failureCalc[i](result);
                         string content = Db.GetTroubleCode(code);
-                        ret[code] = content;
+                        ret.Add(new TroubleCode(code, content));
                     }
                 }
                 return ret;
@@ -384,7 +384,7 @@ namespace JM.QingQi.Vehicle
             throw new IOException(Db.GetText("None Trouble Code"));
         }
 
-        public Dictionary<string, string> ReadHistoryTroubleCode()
+        public List<TroubleCode> ReadHistoryTroubleCode()
         {
             byte[] cmd = Db.GetCommand("Failure History Pointer");
             byte[] result = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
@@ -393,7 +393,7 @@ namespace JM.QingQi.Vehicle
                 throw new IOException(Db.GetText("Read Trouble Code Fail"));
             }
 
-            Dictionary<string, string> ret = new Dictionary<string, string>();
+            List<TroubleCode> ret = new List<TroubleCode>();
             int pointer = Convert.ToInt32(Encoding.ASCII.GetString(result));
 
             for (int i = 0; i < 16; i++)
@@ -418,7 +418,7 @@ namespace JM.QingQi.Vehicle
                 {
                     string code = Encoding.ASCII.GetString(result);
                     string content = Db.GetTroubleCode(code);
-                    ret[code] = content;
+                    ret.Add(new TroubleCode(code, content));
                 }
             }
             if (ret.Count == 0)

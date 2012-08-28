@@ -600,7 +600,7 @@ namespace JM.QingQi.Vehicle
             };
         }
 
-        public Dictionary<string, string> ReadTroubleCode(bool isHistory)
+        public List<TroubleCode> ReadTroubleCode(bool isHistory)
         {
             byte[] cmd = Db.GetCommand("Read DTC By Status");
             byte[] result = Protocol.SendAndRecv(startDiagnosticSession, 0, startDiagnosticSession.Length, Pack);
@@ -620,7 +620,7 @@ namespace JM.QingQi.Vehicle
 
             int dtcNum = Convert.ToInt32(result[1]);
 
-            Dictionary<string, string> tcs = new Dictionary<string, string>();
+            List<TroubleCode> tcs = new List<TroubleCode>();
 
             if (dtcNum == 0)
             {
@@ -638,7 +638,7 @@ namespace JM.QingQi.Vehicle
                 }
                 string code = Utils.CalcStdObdTroubleCode(result, i, 3, 2);
                 string content = Db.GetTroubleCode(code);
-                tcs.Add(code, content);
+                tcs.Add(new TroubleCode(code, content));
             }
 
             if (tcs.Count == 0)

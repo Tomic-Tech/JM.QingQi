@@ -85,7 +85,7 @@ namespace JM.QingQi.Vehicle
             });
         }
 
-        public Dictionary<string, string> ReadTroubleCode()
+        public List<TroubleCode> ReadTroubleCode()
         {
             byte[] dtcNumberCmd = Db.GetCommand("Read DTC Number");
             byte[] readDtc = Db.GetCommand("Read DTC");
@@ -116,12 +116,12 @@ namespace JM.QingQi.Vehicle
             }
 
             result = dtcs.ToArray();
-            Dictionary<string, string> codes = new Dictionary<string, string>();
+            List<TroubleCode> codes = new List<TroubleCode>();
             for (int i = 0; i < dtcNum; i++)
             {
                 string code = Utils.CalcStdObdTroubleCode(result, i, 2, 0);
                 string content = Db.GetTroubleCode(code);
-                codes.Add(code, content);
+                codes.Add(new TroubleCode(code, content));
             }
             return codes;
         }

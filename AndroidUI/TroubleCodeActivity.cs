@@ -24,7 +24,7 @@ namespace JM.QingQi.AndroidUI
         private Dictionary<string, ProtocolFunc> protocolFuncs;
         private Dictionary<string, ProtocolFunc> funcs;
         private string model;
-        private Dictionary<string, string> codes = null;
+        private List<Core.TroubleCode> codes = null;
         private ProgressDialog status = null;
 
         private enum UIStatus
@@ -242,7 +242,7 @@ namespace JM.QingQi.AndroidUI
             int i = 0;
             foreach (var item in codes)
             {
-                arrays[i++] = item.Key + ": " + item.Value;
+                arrays[i++] = item.Code + ": " + item.Content;
             }
 
             RunOnUiThread(() =>
