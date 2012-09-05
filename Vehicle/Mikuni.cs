@@ -548,20 +548,37 @@ namespace JM.QingQi.Vehicle
         {
             stopReadDataStream = false;
 
-            vec.DeployShowedIndex();
+            var items = vec.Items;
+            int i = 0;
 
             while (!stopReadDataStream)
             {
-                int i = vec.NextShowedIndex();
-                byte[] cmd = Db.GetCommand(vec[i].CmdID);
-                byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
-                if (recv == null)
+                foreach (var item in items)
                 {
-                    i++;
-                    throw new IOException(JM.Core.SysDB.GetText("Communication Fail"));
+                    byte[] cmd = Db.GetCommand(item.CmdID);
+                    byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+                    if (recv == null)
+                    {
+                        throw new IOException(JM.Core.SysDB.GetText("Communication Fail"));
+                    }
+                    // calc
+                    item.Value = DataStreamCalc[item.ShortName](recv);
+                    if (stopReadDataStream)
+                        break;
                 }
-                // calc
-                vec[i].Value = DataStreamCalc[vec[i].ShortName](recv);
+                //byte[] cmd = Db.GetCommand(items[i].CmdID);
+                //byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+                //if (recv == null)
+                //{
+                //    throw new IOException(JM.Core.SysDB.GetText("Communication Fail"));
+                //}
+                //// calc
+                //items[i].Value = DataStreamCalc[vec[i].ShortName](recv);
+                //i++;
+                //if (i == items.Count)
+                //{
+                //    i = 0;
+                //}
             }
         }
 

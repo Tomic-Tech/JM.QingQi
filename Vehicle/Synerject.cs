@@ -672,7 +672,7 @@ namespace JM.QingQi.Vehicle
 
         public void ReadDataStream(Core.LiveDataVector vec)
         {
-            vec.DeployShowedIndex();
+            var items = vec.Items;
             byte[] cmd = Db.GetCommand("Read Data By Local Identifier1");
             stopReadDataStream = false;
 
@@ -702,10 +702,18 @@ namespace JM.QingQi.Vehicle
             });
             while (!stopReadDataStream)
             {
-                int i = vec.NextShowedIndex();
-                vec[i].Value = DataStreamCalc[vec[i].ShortName](recv);
-                Thread.Sleep(10);
-                Thread.Yield();
+                foreach (var item in items)
+                {
+                    item.Value = DataStreamCalc[item.ShortName](recv);
+                    Thread.Sleep(10);
+                    Thread.Yield();
+                    if (stopReadDataStream)
+                        break;
+                }
+                //int i = vec.NextShowedIndex();
+                //vec[i].Value = DataStreamCalc[vec[i].ShortName](recv);
+                //Thread.Sleep(10);
+                //Thread.Yield();
                 //byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
                 //if (recv == null)
                 //    throw new IOException(Db.GetText("Communication Fail"));

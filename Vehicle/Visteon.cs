@@ -139,58 +139,95 @@ namespace JM.QingQi.Vehicle
         {
             stopReadDataStream = false;
 
-            vec.DeployShowedIndex();
+            var items = vec.Items;
 
             while (!stopReadDataStream)
             {
-                int i = vec.NextShowedIndex();
-                byte[] cmd = Db.GetCommand(vec[i].CmdID);
-                byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
-                if (recv == null)
+                foreach (var item in items)
                 {
-                    throw new IOException(JM.Core.SysDB.GetText("Communication Fail"));
+                    byte[] cmd = Db.GetCommand(item.CmdID);
+                    byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+                    if (recv == null)
+                    {
+                        throw new IOException(JM.Core.SysDB.GetText("Communication Fail"));
+                    }
+                    item.Value = DataStreamCalc[item.ShortName](recv);
+                    System.Threading.Thread.Sleep(50);
+                    if (stopReadDataStream)
+                        break;
                 }
-                // calc
-                vec[i].Value = DataStreamCalc[vec[i].ShortName](recv);
-                System.Threading.Thread.Sleep(50);
+                //int i = vec.NextShowedIndex();
+                //byte[] cmd = Db.GetCommand(vec[i].CmdID);
+                //byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+                //if (recv == null)
+                //{
+                //    throw new IOException(JM.Core.SysDB.GetText("Communication Fail"));
+                //}
+                //// calc
+                //vec[i].Value = DataStreamCalc[vec[i].ShortName](recv);
+                //System.Threading.Thread.Sleep(50);
             }
         }
 
         public void StaticDataStream(Core.LiveDataVector vec)
         {
-            vec.DeployShowedIndex();
+            var items = vec.Items;
 
-            for (int i = 0; i < vec.ShowedCount; i++)
+            foreach (var item in items)
             {
-                int index = vec.NextShowedIndex();
-                byte[] cmd = Db.GetCommand(vec[i].CmdID);
+                byte[] cmd = Db.GetCommand(item.CmdID);
                 byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
                 if (recv == null)
                 {
                     throw new IOException(JM.Core.SysDB.GetText("Communication Fail"));
                 }
-                // calc
-                vec[i].Value = DataStreamCalc[vec[i].ShortName](recv);
+                item.Value = DataStreamCalc[item.ShortName](recv);
                 System.Threading.Thread.Sleep(50);
             }
+
+            //for (int i = 0; i < vec.ShowedCount; i++)
+            //{
+            //    int index = vec.NextShowedIndex();
+            //    byte[] cmd = Db.GetCommand(vec[i].CmdID);
+            //    byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+            //    if (recv == null)
+            //    {
+            //        throw new IOException(JM.Core.SysDB.GetText("Communication Fail"));
+            //    }
+            //    // calc
+            //    vec[i].Value = DataStreamCalc[vec[i].ShortName](recv);
+            //    System.Threading.Thread.Sleep(50);
+            //}
         }
 
         public void ReadFreezeFrame(Core.LiveDataVector vec)
         {
-            vec.DeployShowedIndex();
+            var items = vec.Items;
 
-            for (int i = 0; i < vec.ShowedCount; i++)
+            foreach (var item in items)
             {
-                int index = vec.ShowedIndex(i);
-                byte[] cmd = Db.GetCommand(vec[index].CmdID);
+                byte[] cmd = Db.GetCommand(item.CmdID);
                 byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
                 if (recv == null)
                 {
                     throw new IOException(JM.Core.SysDB.GetText("Communication Fail"));
                 }
-                // Cal
-                vec[index].Value = DataStreamCalc[vec[index].ShortName](recv);
+                item.Value = DataStreamCalc[item.ShortName](recv);
+                //System.Threading.Thread.Sleep(50);
             }
+
+            //for (int i = 0; i < vec.ShowedCount; i++)
+            //{
+            //    int index = vec.ShowedIndex(i);
+            //    byte[] cmd = Db.GetCommand(vec[index].CmdID);
+            //    byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
+            //    if (recv == null)
+            //    {
+            //        throw new IOException(JM.Core.SysDB.GetText("Communication Fail"));
+            //    }
+            //    // Cal
+            //    vec[index].Value = DataStreamCalc[vec[index].ShortName](recv);
+            //}
         }
     }
 }
