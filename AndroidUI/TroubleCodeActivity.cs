@@ -16,7 +16,7 @@ using JM.QingQi.Vehicle;
 
 namespace JM.QingQi.AndroidUI
 {
-    [Activity(Theme = "@style/Theme.Default", Label = "Trouble Code")]
+    [Activity(Theme = "@style/Theme.StaticDataStream", Label = "Trouble Code")]
     public class TroubleCodeActivity : ListActivity
     {
         public delegate void ProtocolFunc();
@@ -38,13 +38,13 @@ namespace JM.QingQi.AndroidUI
         public TroubleCodeActivity()
         {
             protocolFuncs = new Dictionary<string, ProtocolFunc>();
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")] = OnSynerjectProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200GY-F")] = OnMikuniProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250GY")] = OnSynerjectProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250T")] = OnSynerjectProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200-3D")] = OnMikuniProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200J-3L")] = OnMikuniProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250J-2L")] = OnVisteonProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")] = OnSynerjectProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200GY-F")] = OnMikuniProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250GY")] = OnSynerjectProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250T")] = OnSynerjectProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200-3D")] = OnMikuniProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200J-3L")] = OnMikuniProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250J-2L")] = OnVisteonProtocol;
         }
 
         protected override void OnCreate(Bundle bundle)
@@ -81,7 +81,7 @@ namespace JM.QingQi.AndroidUI
                 }
                 else if (uiStatus == UIStatus.Result)
                 {
-                    if (model == ResourceManager.Instance.VehicleDB.GetText("QM250J-2L"))
+                    if (model == StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250J-2L"))
                     {
                         this.Finish();
                         return true;
@@ -92,9 +92,9 @@ namespace JM.QingQi.AndroidUI
                         ListView.ItemClick -= OnItemClickMikuni;
                         ListView.ItemClick -= OnItemClickSynerject;
                         ListView.ItemClick -= OnItemClickVisteon;
-                        if ((model == ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")) ||
-                            (model == ResourceManager.Instance.VehicleDB.GetText("QM250GY")) ||
-                            (model == ResourceManager.Instance.VehicleDB.GetText("QM250T")))
+                        if ((model == StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")) ||
+                            (model == StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250GY")) ||
+                            (model == StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250T")))
                         {
                             OnSynerjectProtocol();
                         }
@@ -112,8 +112,8 @@ namespace JM.QingQi.AndroidUI
         private void OnMikuniProtocol()
         {
             string[] arrays = new string[2];
-            arrays[0] = ResourceManager.Instance.VehicleDB.GetText("Read Current Trouble Code");
-            arrays[1] = ResourceManager.Instance.VehicleDB.GetText("Read History Trouble Code");
+            arrays[0] = StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read Current Trouble Code");
+            arrays[1] = StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read History Trouble Code");
             ListView.Adapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, arrays);
             funcs = new Dictionary<string, ProtocolFunc>();
             funcs[arrays[0]] = () =>
@@ -125,7 +125,7 @@ namespace JM.QingQi.AndroidUI
                     codes = protocol.ReadCurrentTroubleCode();
                 });
 
-                task.ContinueWith(ShowResult);
+				task.ContinueWith((t) => {ShowResult(t, null);});
             };
 
             funcs[arrays[1]] = () =>
@@ -138,7 +138,7 @@ namespace JM.QingQi.AndroidUI
                     codes = protocol.ReadHistoryTroubleCode();
                 });
 
-                task.ContinueWith(ShowResult);
+				task.ContinueWith((t) => {ShowResult(t, null);});
             };
 
             ListView.ItemClick += OnItemClickMikuni;
@@ -161,8 +161,8 @@ namespace JM.QingQi.AndroidUI
 
         //    task.ContinueWith(ShowResult);
             string[] arrays = new string[2];
-            arrays[0] = ResourceManager.Instance.VehicleDB.GetText("Read Current Trouble Code");
-            arrays[1] = ResourceManager.Instance.VehicleDB.GetText("Read History Trouble Code");
+            arrays[0] = StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read Current Trouble Code");
+            arrays[1] = StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read History Trouble Code");
             ListView.Adapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, arrays);
             funcs = new Dictionary<string, ProtocolFunc>();
             funcs[arrays[0]] = () =>
@@ -174,7 +174,7 @@ namespace JM.QingQi.AndroidUI
                     codes = protocol.ReadTroubleCode(false);
                 });
 
-                task.ContinueWith(ShowResult);
+				task.ContinueWith((t) => {ShowResult(t, null);});
             };
 
             funcs[arrays[1]] = () =>
@@ -187,7 +187,7 @@ namespace JM.QingQi.AndroidUI
                     codes = protocol.ReadTroubleCode(true);
                 });
 
-                task.ContinueWith(ShowResult);
+				task.ContinueWith((t) => {ShowResult(t, null);});
             };
 
             ListView.ItemClick += OnItemClickSynerject;
@@ -212,7 +212,7 @@ namespace JM.QingQi.AndroidUI
                 codes = protocol.ReadTroubleCode();
             });
 
-            task.ContinueWith(ShowResult);
+			task.ContinueWith((t) => {ShowResult(t, (sender, e) => this.Finish());});
         }
 
         private void OnItemClickVisteon(object sender, AdapterView.ItemClickEventArgs e)
@@ -242,7 +242,7 @@ namespace JM.QingQi.AndroidUI
             int i = 0;
             foreach (var item in codes)
             {
-                arrays[i++] = item.Code + ": " + item.Content;
+                arrays[i++] = StaticString.beforeBlank + item.Code + ": " + item.Content;
             }
 
             RunOnUiThread(() =>
@@ -256,14 +256,14 @@ namespace JM.QingQi.AndroidUI
             ListView.ItemClick += OnTroubleCodeItemClick;
         }
 
-        private void ShowResult(Task t)
+		private void ShowResult(Task t, EventHandler<DialogClickEventArgs> listener)
         {
             RunOnUiThread(() =>
             {
                 status.Dismiss();
                 if (t.IsFaulted)
                 {
-                    DialogManager.ShowFatal(this, t.Exception.InnerException.Message, null);
+					DialogManager.ShowFatal(this, StaticString.beforeBlank + t.Exception.InnerException.Message, listener);
                 }
                 else
                 {

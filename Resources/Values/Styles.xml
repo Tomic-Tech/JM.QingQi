@@ -9,4 +9,9 @@
     <item name="android:windowNoTitle">true</item>
     <item name="android:windowFullscreen">true</item>
   </style>
+  <style name="Theme.StaticDataStream" parent="android:Theme.Light">
+    <item name="android:windowNoTitle">true</item>
+    <item name="android:windowFullscreen">true</item>
+    <item name="android:textSize">18sp</item>
+  </style>
 </resources>

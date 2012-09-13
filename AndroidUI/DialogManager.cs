@@ -4,7 +4,7 @@ using System.Text;
 using Android.App;
 using Android.Content;
 
-namespace JM.QingQi.Vehicle
+namespace JM.QingQi.AndroidUI
 {
     internal class DialogManager
     {
@@ -19,7 +19,7 @@ namespace JM.QingQi.Vehicle
         public static AlertDialog ShowFatal(Context cxt, string msg, EventHandler<DialogClickEventArgs> listener)
         {
             AlertDialog fatal = new AlertDialog.Builder(cxt).SetMessage(msg)
-                .SetPositiveButton(ResourceManager.Instance.VehicleDB.GetText("OK"),listener)
+                .SetPositiveButton(Vehicle.ResourceManager.Instance.VehicleDB.GetText("OK"),listener)
                 .Create();
             fatal.Show();
             return fatal;
@@ -32,7 +32,7 @@ namespace JM.QingQi.Vehicle
             {
                 which = w.Which;
             })
-                .SetPositiveButton(ResourceManager.Instance.VehicleDB.GetText("OK"), listener)
+                .SetPositiveButton(Vehicle.ResourceManager.Instance.VehicleDB.GetText("OK"), listener)
                 .Create();
             list.Show();
             return list;

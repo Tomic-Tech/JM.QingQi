@@ -81,7 +81,7 @@ namespace JM.QingQi.Vehicle
 
             DataStreamCalc["DTC"] = (recv =>
             {
-                return Core.Utils.CalcStdObdTroubleCode(recv, 0, 0, 2);
+                return Core.Utils.CalcStdObdTroubleCode(recv, 0, 0, 3);
             });
         }
 
@@ -207,13 +207,14 @@ namespace JM.QingQi.Vehicle
             foreach (var item in items)
             {
                 byte[] cmd = Db.GetCommand(item.CmdID);
+				
                 byte[] recv = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
                 if (recv == null)
                 {
                     throw new IOException(JM.Core.SysDB.GetText("Communication Fail"));
                 }
                 item.Value = DataStreamCalc[item.ShortName](recv);
-                //System.Threading.Thread.Sleep(50);
+                System.Threading.Thread.Sleep(50);
             }
 
             //for (int i = 0; i < vec.ShowedCount; i++)

@@ -42,6 +42,17 @@ namespace JM.QingQi.AndroidUI
             //CreateShortCut(this, Resource.Drawable.Icon, Resource.String.ApplicationName);
         }
 
+#if TOMIC_ANDROID
+        public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
+        {
+            if (keyCode == Keycode.Back)
+            {
+                return true;
+            }
+            return base.OnKeyDown(keyCode, e);
+        }
+#endif
+
         protected void OnButtonSelectedTypes(object sender, EventArgs e)
         {
             Intent intent = new Intent(this, typeof(SelectedTypesActivity));

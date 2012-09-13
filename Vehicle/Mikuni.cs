@@ -52,41 +52,41 @@ namespace JM.QingQi.Vehicle
             DataStreamCalc = new Dictionary<string, DataCalcDelegate>();
             DataStreamCalc["ER"] = (recv) =>
             {
-                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) * 500) / 256);
+				return string.Format("{0:F0}", (Convert.ToDouble(Convert.ToInt32(Encoding.ASCII.GetString(recv), 16)) * 500) / 256);
                 //return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 256) * 500);
             };
             DataStreamCalc["BV"] = (recv) =>
             {
-                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 512));
+				return string.Format("{0:F1}", (Convert.ToDouble(Convert.ToInt32(Encoding.ASCII.GetString(recv), 16))) / 512);
             };
             DataStreamCalc["TPS"] = (recv) =>
             {
-                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 512));
+				return string.Format("{0:F1}", (Convert.ToDouble(Convert.ToInt32(Encoding.ASCII.GetString(recv), 16))) / 512);
             };
             DataStreamCalc["MAT"] = (recv) =>
             {
-                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 256) - 50);
+				return string.Format("{0:F1}", (Convert.ToDouble(Convert.ToInt32(Encoding.ASCII.GetString(recv), 16))) / 256 - 50);
             };
             DataStreamCalc["ET"] = (recv) =>
             {
-                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 256) - 50);
+				return string.Format("{0:F1}", (Convert.ToDouble(Convert.ToInt32(Encoding.ASCII.GetString(recv), 16))) / 256 - 50);
             };
             DataStreamCalc["BP"] = (recv) =>
             {
-                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 512));
+				return string.Format("{0:F1}", (Convert.ToDouble(Convert.ToInt32(Encoding.ASCII.GetString(recv), 16))) / 512);
             };
             DataStreamCalc["MP"] = (recv) =>
             {
-                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 512));
+				return string.Format("{0:F1}", (Convert.ToDouble(Convert.ToInt32(Encoding.ASCII.GetString(recv), 16))) / 512);
             };
             DataStreamCalc["IT"] = (recv) =>
             {
-                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) * 15) / 256 - 22.5);
+				return string.Format("{0:F1}", (Convert.ToDouble(Convert.ToInt32(Encoding.ASCII.GetString(recv), 16)) * 15) / 256 - 22.5);
                 //return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 256) * 15 - 22.5);
             };
             DataStreamCalc["IPW"] = (recv) =>
             {
-                return string.Format("{0}", (Convert.ToUInt16(Encoding.ASCII.GetString(recv), 16) / 2));
+				return string.Format("{0:F0}", (Convert.ToDouble(Convert.ToInt32(Encoding.ASCII.GetString(recv), 16))) / 2);
             };
             DataStreamCalc["TS"] = (recv) =>
             {
@@ -101,7 +101,7 @@ namespace JM.QingQi.Vehicle
             };
             DataStreamCalc["ERF"] = (recv) =>
             {
-                if ((Convert.ToUInt16(Encoding.ASCII.GetString(recv)) & 0x0001) == 1)
+				if ((Convert.ToUInt16(Encoding.ASCII.GetString(recv)) & 0x0001) == 1)
                 {
                     return Db.GetText("Running");
                 }
@@ -457,37 +457,63 @@ namespace JM.QingQi.Vehicle
             }
         }
 
-        public string GetECUVersion()
-        {
-            byte[] cmd = Db.GetCommand("Read ECU Version 1");
-            byte[] result = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
-            if (result == null)
-            {
-                throw new IOException(Db.GetText("Read ECU Version Fail"));
-            }
+        public string GetECUVersion ()
+		{
+			byte[] cmd = Db.GetCommand ("Read ECU Version 1");
+			byte[] result = Protocol.SendAndRecv (cmd, 0, cmd.Length, Pack);
+			if (result == null) {
+				throw new IOException (Db.GetText ("Read ECU Version Fail"));
+			}
 
-            cmd = Db.GetCommand("Read ECU Version 2");
-            Array.Copy(result, 0, cmd, 2, 4);
-            result = Protocol.SendAndRecv(cmd, 0, cmd.Length, Pack);
-            if (result == null)
-            {
-                throw new IOException(Db.GetText("Read ECU Version Fail"));
-            }
+			cmd = Db.GetCommand ("Read ECU Version 2");
+			Array.Copy (result, 0, cmd, 2, 4);
+			result = Protocol.SendAndRecv (cmd, 0, cmd.Length, Pack);
+			if (result == null) {
+				throw new IOException (Db.GetText ("Read ECU Version Fail"));
+			}
 
-            string hex = Encoding.ASCII.GetString(result);
-            //StringBuilder ret = new StringBuilder();
+			string hex = Encoding.ASCII.GetString (result);
+			StringBuilder ret = new StringBuilder ();
+			ret.Append ("ECU");
 
-            //for (int i = 0; i < hex.Length; i += 2)
-            //{
-            //    string e = hex.Substring(i, 2);
-            //    byte h = Convert.ToByte(e, 16);
-            //    char c = Convert.ToChar(h);
-            //    if (Char.IsLetterOrDigit(c))
-            //        ret.Append(c);
-            //}
+//            for (int i = 0; i < hex.Length; i += 2)
+//            {
+//                string e = hex.Substring(i, 2);
+//                byte h = Convert.ToByte(e, 16);
+//                char c = Convert.ToChar(h);
+//                if (Char.IsLetterOrDigit(c))
+//                   ret.Append(c);
+//            }
+			for (int i = 0; i < 6; i += 2) {
+				string e = hex.Substring (i, 2);
+				byte h = Convert.ToByte (e, 16);
+				char c = Convert.ToChar (h);
+				if (Char.IsLetterOrDigit (c))
+					ret.Append (c);
+			}
+			ret.Append ("-");
 
-            //return ret.ToString();
-            return hex.ToString();
+			for (int i = 6; i < 14; i += 2) {
+				string e = hex.Substring (i, 2);
+				byte h = Convert.ToByte (e, 16);
+				char c = Convert.ToChar (h);
+				if (Char.IsLetterOrDigit (c))
+					ret.Append (c);
+			}
+
+			ret.Append ("\nV");
+
+			for (int i = 16; i < 28; i += 2)
+			{
+				string e = hex.Substring(i, 2);
+				byte h = Convert.ToByte (e, 16);
+				char c = Convert.ToChar (h);
+				if (Char.IsLetterOrDigit(c))
+					ret.Append (c);
+			}
+
+            return ret.ToString();
+            //return hex.ToString();
         }
 
         public void TPSIdleSetting()
@@ -549,7 +575,7 @@ namespace JM.QingQi.Vehicle
             stopReadDataStream = false;
 
             var items = vec.Items;
-            int i = 0;
+            //int i = 0;
 
             while (!stopReadDataStream)
             {

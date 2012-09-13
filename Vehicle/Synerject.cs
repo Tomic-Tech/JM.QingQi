@@ -184,7 +184,8 @@ namespace JM.QingQi.Vehicle
 
             DataStreamCalc["LV_AFR"] = (recv) =>
             {
-                if ((recv[23] & 0x01) != 0)
+                //if ((recv[23] & 0x01) != 0)
+				if ((recv[23] & 0x80) != 0)
                 {
                     return Db.GetText("Thick");
                 }
@@ -196,7 +197,8 @@ namespace JM.QingQi.Vehicle
 
             DataStreamCalc["LV_CELP"] = (recv) =>
             {
-                if ((recv[23] & 0x02) != 0)
+                //if ((recv[23] & 0x02) != 0)
+				if ((recv[23] & 0x40) != 0)
                 {
                     return Db.GetText("Yes");
                 }
@@ -208,7 +210,8 @@ namespace JM.QingQi.Vehicle
 
             DataStreamCalc["LV_CUT_OUT"] = (recv) =>
             {
-                if ((recv[23] & 0x04) != 0)
+                //if ((recv[23] & 0x04) != 0)
+				if ((recv[23] & 0x20) != 0)
                 {
                     return Db.GetText("Oil - Cut");
                 }
@@ -220,7 +223,8 @@ namespace JM.QingQi.Vehicle
 
             DataStreamCalc["LV_EOL_EFP_PRIM"] = (recv) =>
             {
-                if ((recv[23] & 0x08) != 0)
+				if ((recv[23] & 0x10) != 0)
+                //if ((recv[23] & 0x08) != 0)
                 {
                     return Db.GetText("Yes");
                 }
@@ -232,7 +236,8 @@ namespace JM.QingQi.Vehicle
 
             DataStreamCalc["LV_EOL_EFP_PRIM_ACT"] = (recv) =>
             {
-                if ((recv[23] & 0x10) != 0)
+				if ((recv[23] & 0x08) != 0)
+                //if ((recv[23] & 0x10) != 0)
                 {
                     return Db.GetText("Yes");
                 }
@@ -244,7 +249,8 @@ namespace JM.QingQi.Vehicle
 
             DataStreamCalc["LV_IMMO_PROG"] = (recv) =>
             {
-                if ((recv[23] & 0x20) != 0)
+				if ((recv[23] & 0x04) != 0)
+                //if ((recv[23] & 0x20) != 0)
                 {
                     return Db.GetText("Yes");
                 }
@@ -256,7 +262,8 @@ namespace JM.QingQi.Vehicle
 
             DataStreamCalc["LV_IMMO_ECU_PROG"] = (recv) =>
             {
-                if ((recv[23] & 0x40) != 0)
+				if ((recv[23] & 0x02) != 0)
+                //if ((recv[23] & 0x40) != 0)
                 {
                     return Db.GetText("Yes");
                 }
@@ -268,7 +275,8 @@ namespace JM.QingQi.Vehicle
 
             DataStreamCalc["LV_LOCK_IMOB"] = (recv) =>
             {
-                if ((recv[23] & 0x80) != 0)
+				if ((recv[23] & 0x01) != 0)
+                //if ((recv[23] & 0x80) != 0)
                 {
                     return Db.GetText("Yes");
                 }
@@ -280,7 +288,8 @@ namespace JM.QingQi.Vehicle
 
             DataStreamCalc["LV_LSCL_1"] = (recv) =>
             {
-                if ((recv[24] & 0x01) != 0)
+				if ((recv[24] & 0x10) != 0)
+                //if ((recv[24] & 0x01) != 0)
                 {
                     return Db.GetText("Yes");
                 }
@@ -292,7 +301,8 @@ namespace JM.QingQi.Vehicle
 
             DataStreamCalc["LV_LSH_UP_1"] = (recv) =>
             {
-                if ((recv[24] & 0x02) != 0)
+				if ((recv[24] & 0x08) != 0)
+                //if ((recv[24] & 0x02) != 0)
                 {
                     return Db.GetText("Yes");
                 }
@@ -304,7 +314,8 @@ namespace JM.QingQi.Vehicle
 
             DataStreamCalc["LV_REQ_ISC"] = (recv) =>
             {
-                if ((recv[24] & 0x04) != 0)
+				if ((recv[24] & 0x04) != 0)
+                //if ((recv[24] & 0x04) != 0)
                 {
                     return Db.GetText("Idle Controlling");
                 }
@@ -316,7 +327,8 @@ namespace JM.QingQi.Vehicle
 
             DataStreamCalc["LV_VIP"] = (recv) =>
             {
-                if ((recv[24] & 0x08) != 0)
+				if ((recv[24] & 0x02) != 0)
+                //if ((recv[24] & 0x08) != 0)
                 {
                     return Db.GetText("Yes");
                 }
@@ -328,7 +340,8 @@ namespace JM.QingQi.Vehicle
 
             DataStreamCalc["LV_EOP"] = (recv) =>
             {
-                if ((recv[24] & 0x10) != 0)
+				if ((recv[24] & 0x01) != 0)
+                //if ((recv[24] & 0x10) != 0)
                 {
                     return Db.GetText("Yes");
                 }

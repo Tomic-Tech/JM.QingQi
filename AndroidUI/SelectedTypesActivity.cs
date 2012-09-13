@@ -23,13 +23,13 @@ namespace JM.QingQi.AndroidUI
 
             // Create your application here
             string[] arrays = new string[7];
-             arrays[0] = ResourceManager.Instance.VehicleDB.GetText("QM125T-8H");
-            arrays[1] = ResourceManager.Instance.VehicleDB.GetText("QM200GY-F");
-            arrays[2] = ResourceManager.Instance.VehicleDB.GetText("QM250GY");
-            arrays[3] = ResourceManager.Instance.VehicleDB.GetText("QM250T");
-            arrays[4] = ResourceManager.Instance.VehicleDB.GetText("QM200-3D");
-            arrays[5] = ResourceManager.Instance.VehicleDB.GetText("QM200J-3L");
-            arrays[6] = ResourceManager.Instance.VehicleDB.GetText("QM250J-2L");
+            arrays[0] = StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM125T-8H");
+            arrays[1] = StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200GY-F");
+            arrays[2] = StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250GY");
+            arrays[3] = StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250T");
+            arrays[4] = StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200-3D");
+            arrays[5] = StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200J-3L");
+            arrays[6] = StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250J-2L");
             ListAdapter = new ArrayAdapter<string>(
                 this,
                 Android.Resource.Layout.SimpleListItem1,

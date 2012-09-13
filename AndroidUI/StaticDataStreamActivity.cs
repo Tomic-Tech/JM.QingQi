@@ -15,7 +15,7 @@ using JM.QingQi.Vehicle;
 
 namespace JM.QingQi.AndroidUI
 {
-    [Activity(Theme = "@style/Theme.Default", Label = "Static Data Stream Activity")]
+    [Activity(Theme = "@style/Theme.StaticDataStream", Label = "Static Data Stream Activity")]
     public class StaticDataStreamActivity : ListActivity
     {
         private delegate void ProtocolFunc();
@@ -31,13 +31,13 @@ namespace JM.QingQi.AndroidUI
 
             // Create your application here
             protocolFuncs = new Dictionary<string, ProtocolFunc>();
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")] = OnSynerjectProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200GY-F")] = OnMikuniProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250GY")] = OnSynerjectProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250T")] = OnSynerjectProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200-3D")] = OnMikuniProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200J-3L")] = OnMikuniProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250J-2L")] = OnVisteonProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")] = OnSynerjectProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200GY-F")] = OnMikuniProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250GY")] = OnSynerjectProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250T")] = OnSynerjectProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200-3D")] = OnMikuniProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200J-3L")] = OnMikuniProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250J-2L")] = OnVisteonProtocol;
 
             model = Intent.Extras.GetString("Model");
             protocolFuncs[model]();
@@ -71,7 +71,7 @@ namespace JM.QingQi.AndroidUI
 
             for (int i = 0; i < vec.Count; i++)
             {
-                if (model == ResourceManager.Instance.VehicleDB.GetText("QM125T-8H"))
+                if (model == StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM125T-8H"))
                 {
                     if ((vec[i].ShortName == "CRASH") ||
                         (vec[i].ShortName == "DIST_ACT_MIL") ||
@@ -94,7 +94,7 @@ namespace JM.QingQi.AndroidUI
                         vec[i].Enabled = false;
                     }
                 }
-                else if (model == ResourceManager.Instance.VehicleDB.GetText("QM250GY"))
+                else if (model == StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250GY"))
                 {
                     if ((vec[i].ShortName == "CRASH") ||
                         (vec[i].ShortName == "DIST_ACT_MIL") ||
@@ -116,7 +116,7 @@ namespace JM.QingQi.AndroidUI
                         vec[i].Enabled = false;
                     }
                 }
-                else if (model == ResourceManager.Instance.VehicleDB.GetText("QM250T"))
+                else if (model == StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250T"))
                 {
                     if ((vec[i].ShortName == "CRASH") ||
                         (vec[i].ShortName == "DIST_ACT_MIL") ||
@@ -185,7 +185,7 @@ namespace JM.QingQi.AndroidUI
                     string[] arrays = new string[vec.ShowedCount];
                     for (int i = 0; i < vec.ShowedCount; i++)
                     {
-                        arrays[i] = vec[vec.ShowedIndex(i)].Content + " : " + vec[vec.ShowedIndex(i)].Value + " " + vec[vec.ShowedIndex(i)].Unit;
+                        arrays[i] = StaticString.beforeBlank + vec[vec.ShowedIndex(i)].Content + " : " + vec[vec.ShowedIndex(i)].Value + " " + vec[vec.ShowedIndex(i)].Unit;
                     }
                     ListAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, arrays);
                     ListView.ItemClick += OnItemClick;

@@ -14,7 +14,7 @@ using JM.QingQi.Vehicle;
 
 namespace JM.QingQi.AndroidUI
 {
-    [Activity(Theme = "@style/Theme.Default", Label = "Detail Data Stream Activity")]
+    [Activity(Theme = "@style/Theme.StaticDataStream", Label = "Detail Data Stream Activity")]
     public class DetailDataStreamActivity : ListActivity
     {
         protected override void OnCreate(Bundle bundle)
@@ -28,10 +28,10 @@ namespace JM.QingQi.AndroidUI
             int index = vec.ShowedIndex(position);
 
             string[] arrays = new string[4];
-            arrays[0] = vec[index].Content;
-            arrays[1] = vec[index].Value + vec[index].Unit;
-            arrays[2] = vec[index].DefaultValue;
-            arrays[3] = model + position;
+            arrays[0] = StaticString.beforeBlank + vec[index].Content;
+            arrays[1] = StaticString.beforeBlank + vec[index].Value + vec[index].Unit;
+            arrays[2] = StaticString.beforeBlank + vec[index].DefaultValue;
+            arrays[3] = StaticString.beforeBlank + model + position;
 
             ListAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, arrays);
         }

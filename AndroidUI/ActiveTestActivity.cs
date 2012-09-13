@@ -28,13 +28,13 @@ namespace JM.QingQi.AndroidUI
         public ActiveTestActivity()
         {
             protocolFuncs = new Dictionary<string, ProtocolFunc>();
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")] = OnSynerject;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200GY-F")] = null;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250GY")] = OnSynerject;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250T")] = OnSynerject;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200-3D")] = null;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200J-3L")] = null;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250J-2L")] = null;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")] = OnSynerject;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200GY-F")] = null;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250GY")] = OnSynerject;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250T")] = OnSynerject;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200-3D")] = null;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200J-3L")] = null;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250J-2L")] = null;
         }
 
         protected override void OnStart()

@@ -41,24 +41,24 @@ namespace JM.QingQi.AndroidUI
             layout.RemoveAllViews();
 
             protocolFuncs = new Dictionary<string, ProtocolFunc>();
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")] = OnSynerjectProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200GY-F")] = OnMikuniProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250GY")] = OnSynerjectProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250T")] = OnSynerjectProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200-3D")] = OnMikuniProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200J-3L")] = OnMikuniProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250J-2L")] = OnVisteonProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250J-2L") + "Freeze"] = OnVisteonFreezeProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")] = OnSynerjectProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200GY-F")] = OnMikuniProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250GY")] = OnSynerjectProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250T")] = OnSynerjectProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200-3D")] = OnMikuniProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200J-3L")] = OnMikuniProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250J-2L")] = OnVisteonProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250J-2L") + "Freeze"] = OnVisteonFreezeProtocol;
 
             backFuncs = new Dictionary<string, ProtocolFunc>();
-            backFuncs[ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")] = OnSynerjectBack;
-            backFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200GY-F")] = OnMikuniBack;
-            backFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250GY")] = OnSynerjectBack;
-            backFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250T")] = OnSynerjectBack;
-            backFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200-3D")] = OnMikuniBack;
-            backFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200J-3L")] = OnMikuniBack;
-            backFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250J-2L")] = OnVisteonBack;
-            backFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250J-2L") + "Freeze"] = OnVisteonFreezeBack;
+            backFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")] = OnSynerjectBack;
+            backFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200GY-F")] = OnMikuniBack;
+            backFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250GY")] = OnSynerjectBack;
+            backFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250T")] = OnSynerjectBack;
+            backFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200-3D")] = OnMikuniBack;
+            backFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200J-3L")] = OnMikuniBack;
+            backFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250J-2L")] = OnVisteonBack;
+            backFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250J-2L") + "Freeze"] = OnVisteonFreezeBack;
         }
 
         protected override void OnStart()
@@ -102,7 +102,7 @@ namespace JM.QingQi.AndroidUI
             for (int i = 0; i < vec.ShowedCount; i++)
             {
                 TextView content = new TextView(this);
-                content.Text = vec[vec.ShowedIndex(i)].Content;
+                content.Text = StaticString.beforeBlank + vec[vec.ShowedIndex(i)].Content;
                 TextView unit = new TextView(this);
                 unit.Text = vec[vec.ShowedIndex(i)].Unit;
                 TextView value = new TextView(this);
@@ -177,7 +177,7 @@ namespace JM.QingQi.AndroidUI
             Core.LiveDataVector vec = ResourceManager.Instance.LiveDataVector;
             for (int i = 0; i < vec.Count; i++)
             {
-                if (model == ResourceManager.Instance.VehicleDB.GetText("QM125T-8H"))
+                if (model == StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM125T-8H"))
                 {
                     if ((vec[i].ShortName == "CRASH") ||
                         (vec[i].ShortName == "DIST_ACT_MIL") ||
@@ -200,7 +200,7 @@ namespace JM.QingQi.AndroidUI
                         vec[i].Enabled = false;
                     }
                 }
-                else if (model == ResourceManager.Instance.VehicleDB.GetText("QM250GY"))
+                else if (model == StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250GY"))
                 {
                     if ((vec[i].ShortName == "CRASH") ||
                         (vec[i].ShortName == "DIST_ACT_MIL") ||
@@ -223,7 +223,7 @@ namespace JM.QingQi.AndroidUI
                         vec[i].Enabled = false;
                     }
                 }
-                else if (model == ResourceManager.Instance.VehicleDB.GetText("QM250T"))
+                else if (model == StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250T"))
                 {
                     if ((vec[i].ShortName == "CRASH") ||
                         (vec[i].ShortName == "DIST_ACT_MIL") ||
@@ -293,6 +293,8 @@ namespace JM.QingQi.AndroidUI
 
         private void OnVisteonFreezeProtocol()
         {
+			ResourceManager.Instance.LiveDataVector.DeployEnabledIndex();
+			ResourceManager.Instance.LiveDataVector.DeployShowedIndex();
             PreparePage();
 
             status = DialogManager.ShowStatus(this, JM.Core.SysDB.GetText("Communicating"));

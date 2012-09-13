@@ -29,13 +29,13 @@ namespace JM.QingQi.AndroidUI
         public ModelFunctionsActivity()
         {
             protocolFuncs = new Dictionary<string, ProtocolFunc>();
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")] = OnSynerject;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200GY-F")] = OnMikuniProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250GY")] = OnSynerject;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250T")] = OnSynerject;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200-3D")] = OnMikuniProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM200J-3L")] = OnMikuniProtocol;
-            protocolFuncs[ResourceManager.Instance.VehicleDB.GetText("QM250J-2L")] = OnVisteon;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")] = OnSynerject;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200GY-F")] = OnMikuniProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250GY")] = OnSynerject;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250T")] = OnSynerject;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200-3D")] = OnMikuniProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200J-3L")] = OnMikuniProtocol;
+            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250J-2L")] = OnVisteon;
         }
 
         protected override void OnCreate(Bundle bundle)
@@ -76,18 +76,18 @@ namespace JM.QingQi.AndroidUI
         private void OnMikuniProtocol()
         {
             List<string> arrays = new List<string>();
-            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Read Trouble Code"));
-            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code"));
-            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Read Data Stream"));
-            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Static Data Stream"));
+            arrays.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read Trouble Code"));
+            arrays.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code"));
+            arrays.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read Data Stream"));
+            arrays.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Static Data Stream"));
             //            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Activity Test"));
-            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("TPS Idle Adjustment"));
-            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Long Term Learn Value Zone Initialization"));
-            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("ISC Learn Value Initialize"));
-            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("ECU Version"));
+            arrays.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("TPS Idle Adjustment"));
+            arrays.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Long Term Learn Value Zone Initialization"));
+            arrays.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("ISC Learn Value Initialize"));
+            arrays.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("ECU Version"));
 
             funcs = new Dictionary<string, ProtocolFunc>();
-            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Read Trouble Code"), () =>
+            funcs.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read Trouble Code"), () =>
             {
                 Intent intent = new Intent(this, typeof(TroubleCodeActivity));
                 intent.PutExtra("Model", model);
@@ -95,7 +95,7 @@ namespace JM.QingQi.AndroidUI
             }
             ); // Read Trouble Code
 
-            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code"), () =>
+            funcs.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code"), () =>
             {
                 ProgressDialog status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Clearing Trouble Code, Please Wait"));;
                 AlertDialog fatal;
@@ -125,7 +125,7 @@ namespace JM.QingQi.AndroidUI
             }
             ); // Clear Trouble Code
 
-            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Read Data Stream"), () =>
+            funcs.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read Data Stream"), () =>
             {
                 ResourceManager.Instance.VehicleDB.LDCatalog = "Mikuni";
                 ResourceManager.Instance.LiveDataVector = ResourceManager.Instance.VehicleDB.GetLiveData();
@@ -135,7 +135,7 @@ namespace JM.QingQi.AndroidUI
             }
             ); // Read Data Stream
 
-            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Static Data Stream"), () =>
+            funcs.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Static Data Stream"), () =>
             {
                 ResourceManager.Instance.VehicleDB.LDCatalog = "Mikuni";
                 ResourceManager.Instance.LiveDataVector = ResourceManager.Instance.VehicleDB.GetLiveData();
@@ -144,13 +144,13 @@ namespace JM.QingQi.AndroidUI
                 StartActivity(intent);
             });
 
-            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Activity Test"), () =>
+            funcs.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Activity Test"), () =>
             {
 
             }
             ); // Activity Test
 
-            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("ECU Version"), () =>
+            funcs.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("ECU Version"), () =>
             {
                 ProgressDialog status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Reading ECU Version, Please Wait"));
                 AlertDialog fatal;
@@ -172,6 +172,17 @@ namespace JM.QingQi.AndroidUI
                         }
                         else
                         {
+							if (model == (StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200GY-F")))
+							{
+								version = "M16-01\n" + version;
+							} else if (model == (StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200J-3L")))
+							{
+								version = "M16-00\n" + version;
+							}
+							else if (model == (StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200-3D")))
+							{
+								version = "M16-02\n" + version;
+							}
                             fatal = DialogManager.ShowFatal(this, version, null);
                         }
                     });
@@ -179,7 +190,7 @@ namespace JM.QingQi.AndroidUI
             }
             ); // ECU Version
 
-            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("TPS Idle Adjustment"), () =>
+            funcs.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("TPS Idle Adjustment"), () =>
             {
                 ProgressDialog status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
                 AlertDialog fatal;
@@ -208,7 +219,7 @@ namespace JM.QingQi.AndroidUI
             }
             ); // TPS Idle
 
-            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Long Term Learn Value Zone Initialization"), () =>
+            funcs.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Long Term Learn Value Zone Initialization"), () =>
             {
                 ProgressDialog status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
                 AlertDialog fatal;
@@ -237,7 +248,7 @@ namespace JM.QingQi.AndroidUI
             }
             ); // Long Term
 
-            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("ISC Learn Value Initialize"), () =>
+            funcs.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("ISC Learn Value Initialize"), () =>
             {
                 ProgressDialog status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
                 AlertDialog fatal;
@@ -274,16 +285,16 @@ namespace JM.QingQi.AndroidUI
         private void OnSynerject()
         {
             List<string> arrays = new List<string>();
-            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Read Trouble Code"));
-            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code"));
-            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Read Data Stream"));
-            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Static Data Stream"));
-            if (model != ResourceManager.Instance.VehicleDB.GetText("QM125T-8H"))
-                arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Activity Test"));
-            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("ECU Version"));
+            arrays.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read Trouble Code"));
+            arrays.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code"));
+            arrays.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read Data Stream"));
+            arrays.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Static Data Stream"));
+            if (model != StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM125T-8H"))
+                arrays.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Activity Test"));
+            arrays.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("ECU Version"));
 
             funcs = new Dictionary<string, ProtocolFunc>();
-            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Read Trouble Code"), () =>
+            funcs.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read Trouble Code"), () =>
             {
                 Intent intent = new Intent(
                 this,
@@ -294,7 +305,7 @@ namespace JM.QingQi.AndroidUI
             }
             );
 
-            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code"), () =>
+            funcs.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code"), () =>
             {
                 ProgressDialog status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Clearing Trouble Code, Please Wait"));
                 AlertDialog fatal;
@@ -322,7 +333,7 @@ namespace JM.QingQi.AndroidUI
                 });
             });
 
-            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Read Data Stream"), () =>
+            funcs.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read Data Stream"), () =>
             {
                 ResourceManager.Instance.VehicleDB.LDCatalog = "Synerject";
                 ResourceManager.Instance.LiveDataVector = ResourceManager.Instance.VehicleDB.GetLiveData();
@@ -332,7 +343,7 @@ namespace JM.QingQi.AndroidUI
             }
             ); // Read Data Stream
 
-            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Static Data Stream"), () =>
+            funcs.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Static Data Stream"), () =>
             {
                 ResourceManager.Instance.VehicleDB.LDCatalog = "Synerject";
                 ResourceManager.Instance.LiveDataVector = ResourceManager.Instance.VehicleDB.GetLiveData();
@@ -341,7 +352,7 @@ namespace JM.QingQi.AndroidUI
                 StartActivity(intent);
             });
 
-            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Activity Test"), () =>
+            funcs.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Activity Test"), () =>
             {
                 Intent intent = new Intent(this, typeof(ActiveTestActivity));
                 intent.PutExtra("Model", model);
@@ -349,7 +360,7 @@ namespace JM.QingQi.AndroidUI
             }
             ); // Activity Test
 
-            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("ECU Version"), () =>
+            funcs.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("ECU Version"), () =>
             {
                 ProgressDialog status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Reading ECU Version, Please Wait"));
                 AlertDialog fatal;
@@ -372,7 +383,7 @@ namespace JM.QingQi.AndroidUI
                         }
                         else
                         {
-                            fatal = DialogManager.ShowFatal(this, version, null);
+                            fatal = DialogManager.ShowFatal(this, StaticString.beforeBlank + version, null);
                         }
                     });
                 });
@@ -386,16 +397,16 @@ namespace JM.QingQi.AndroidUI
         private void OnVisteon()
         {
             List<string> arrays = new List<string>();
-            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Read Trouble Code"));
-            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code"));
-            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Read Data Stream"));
-            arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Static Data Stream"));
-            //arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Read Freeze Frame"));
+            arrays.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read Trouble Code"));
+            arrays.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code"));
+            arrays.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read Data Stream"));
+            arrays.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Static Data Stream"));
+			arrays.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read Freeze Frame"));
             //arrays.Add(ResourceManager.Instance.VehicleDB.GetText("Activity Test"));
             //arrays.Add(ResourceManager.Instance.VehicleDB.GetText("ECU Version"));
 
             funcs = new Dictionary<string, ProtocolFunc>();
-            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Read Trouble Code"), () =>
+            funcs.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read Trouble Code"), () =>
             {
                 Intent intent = new Intent(
                 this,
@@ -406,7 +417,7 @@ namespace JM.QingQi.AndroidUI
             }
             );
 
-            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code"), () =>
+            funcs.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Clear Trouble Code"), () =>
             {
                 ProgressDialog status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Clearing Trouble Code, Please Wait"));
                 AlertDialog fatal;
@@ -434,7 +445,7 @@ namespace JM.QingQi.AndroidUI
                 });
             });
 
-            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Read Data Stream"), () =>
+            funcs.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read Data Stream"), () =>
             {
                 ResourceManager.Instance.VehicleDB.LDCatalog = "Visteon";
                 ResourceManager.Instance.LiveDataVector = ResourceManager.Instance.VehicleDB.GetLiveData();
@@ -445,7 +456,7 @@ namespace JM.QingQi.AndroidUI
             }
             ); // Read Data Stream
 
-            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Static Data Stream"), () =>
+            funcs.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Static Data Stream"), () =>
             {
                 ResourceManager.Instance.VehicleDB.LDCatalog = "Visteon";
                 ResourceManager.Instance.LiveDataVector = ResourceManager.Instance.VehicleDB.GetLiveData();
@@ -454,7 +465,7 @@ namespace JM.QingQi.AndroidUI
                 StartActivity(intent);
             });
 
-            funcs.Add(ResourceManager.Instance.VehicleDB.GetText("Read Freeze Frame"), () =>
+            funcs.Add(StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read Freeze Frame"), () =>
             {
                 ResourceManager.Instance.VehicleDB.LDCatalog = "Visteon Freeze";
                 ResourceManager.Instance.LiveDataVector = ResourceManager.Instance.VehicleDB.GetLiveData();
