@@ -24,7 +24,7 @@ namespace JM.QingQi.AndroidUI
             // Create your application here
             string model = Intent.Extras.GetString("Model");
             int position = Intent.Extras.GetInt("Index");
-            Core.LiveDataVector vec = ResourceManager.Instance.LiveDataVector;
+            Core.LiveDataVector vec = Manager.LiveDataVector;
             int index = vec.ShowedIndex(position);
 
             string[] arrays = new string[4];

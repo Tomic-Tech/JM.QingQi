@@ -128,7 +128,7 @@ namespace JM.QingQi.AndroidUI
 
             funcs.Add(StaticString.beforeBlank + Database.GetText("Read Data Stream", "System"), () =>
             {
-                ResourceManager.Instance.LiveDataVector = Database.GetLiveData("Mikuni");
+                Manager.LiveDataVector = Database.GetLiveData("Mikuni");
                 Intent intent = new Intent(this, typeof(DataStreamActivity));
                 intent.PutExtra("Model", model);
                 StartActivity(intent);
@@ -137,7 +137,7 @@ namespace JM.QingQi.AndroidUI
 
             funcs.Add(StaticString.beforeBlank + Database.GetText("Static Data Stream", "System"), () =>
             {
-                ResourceManager.Instance.LiveDataVector = Database.GetLiveData("Mikuni");
+                Manager.LiveDataVector = Database.GetLiveData("Mikuni");
                 Intent intent = new Intent(this, typeof(StaticDataStreamActivity));
                 intent.PutExtra("Model", model);
                 StartActivity(intent);
@@ -157,7 +157,7 @@ namespace JM.QingQi.AndroidUI
                 Task task = Task.Factory.StartNew(() =>
                 {
                     Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox);
-                    version = protocol.GetECUVersion();
+                    version = Manager.ForamtECUVersion(protocol.GetECUVersion());
                 });
 
                 task.ContinueWith((t) =>
@@ -335,7 +335,7 @@ namespace JM.QingQi.AndroidUI
 
             funcs.Add(StaticString.beforeBlank + Database.GetText("Read Data Stream", "System"), () =>
             {
-                ResourceManager.Instance.LiveDataVector = Database.GetLiveData("Synerject");
+                Manager.LiveDataVector = Database.GetLiveData("Synerject");
                 Intent intent = new Intent(this, typeof(DataStreamActivity));
                 intent.PutExtra("Model", model);
                 StartActivity(intent);
@@ -344,7 +344,7 @@ namespace JM.QingQi.AndroidUI
 
             funcs.Add(StaticString.beforeBlank + Database.GetText("Static Data Stream", "System"), () =>
             {
-                ResourceManager.Instance.LiveDataVector = Database.GetLiveData("Synerject");
+                Manager.LiveDataVector = Database.GetLiveData("Synerject");
                 Intent intent = new Intent(this, typeof(StaticDataStreamActivity));
                 intent.PutExtra("Model", model);
                 StartActivity(intent);
@@ -445,7 +445,7 @@ namespace JM.QingQi.AndroidUI
 
             funcs.Add(StaticString.beforeBlank + Database.GetText("Read Data Stream", "System"), () =>
             {
-                ResourceManager.Instance.LiveDataVector = Database.GetLiveData("Visteon");
+                Manager.LiveDataVector = Database.GetLiveData("Visteon");
                 Intent intent = new Intent(this, typeof(DataStreamActivity));
                 intent.PutExtra("Model", model);
                 StartActivity(intent);
@@ -455,7 +455,7 @@ namespace JM.QingQi.AndroidUI
 
             funcs.Add(StaticString.beforeBlank + Database.GetText("Static Data Stream", "System"), () =>
             {
-                ResourceManager.Instance.LiveDataVector = Database.GetLiveData("Visteon");
+                Manager.LiveDataVector = Database.GetLiveData("Visteon");
                 Intent intent = new Intent(this, typeof(StaticDataStreamActivity));
                 intent.PutExtra("Model", model);
                 StartActivity(intent);
@@ -463,7 +463,7 @@ namespace JM.QingQi.AndroidUI
 
             funcs.Add(StaticString.beforeBlank + Database.GetText("Read Freeze Frame", "System"), () =>
             {
-                ResourceManager.Instance.LiveDataVector = Database.GetLiveData("Visteon Freeze");
+                Manager.LiveDataVector = Database.GetLiveData("Visteon Freeze");
                 Intent intent = new Intent(this, typeof(DataStreamActivity));
                 intent.PutExtra("Model", model + "Freeze");
                 StartActivity(intent);
@@ -499,8 +499,8 @@ namespace JM.QingQi.AndroidUI
 
             Task task = Task.Factory.StartNew(() =>
             {
-                if (!ResourceManager.Instance.Commbox.Close() ||
-                    !ResourceManager.Instance.Commbox.Open())
+                if (!Manager.Commbox.Close() ||
+                    !Manager.Commbox.Open())
                 {
                     throw new IOException(Database.GetText("Open Commbox Fail", "System"));
                 }

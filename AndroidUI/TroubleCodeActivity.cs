@@ -210,7 +210,7 @@ namespace JM.QingQi.AndroidUI
             status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
             Task task = Task.Factory.StartNew(() =>
             {
-                Visteon protocol = new Visteon(ResourceManager.Instance.Commbox);
+                Visteon protocol = new Visteon(Manager.Commbox);
                 codes = protocol.ReadTroubleCode();
             });
 

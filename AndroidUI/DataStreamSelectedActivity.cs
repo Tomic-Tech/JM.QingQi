@@ -34,8 +34,8 @@ namespace JM.QingQi.AndroidUI
             ListView.ItemsCanFocus = true;
             ListView.ItemClick += (sender, e) =>
             {
-                int i = ResourceManager.Instance.LiveDataVector.EnabledIndex(e.Position);
-                ResourceManager.Instance.LiveDataVector[i].Showed = !ResourceManager.Instance.LiveDataVector[i].Showed;
+                int i = Manager.LiveDataVector.EnabledIndex(e.Position);
+                Manager.LiveDataVector[i].Showed = !Manager.LiveDataVector[i].Showed;
             };
 
             layout1 = new LinearLayout(this);
@@ -63,14 +63,14 @@ namespace JM.QingQi.AndroidUI
             base.OnStart();
             model = Intent.Extras.GetString("Model");
 
-            ResourceManager.Instance.LiveDataVector.DeployEnabledIndex();
+            Manager.LiveDataVector.DeployEnabledIndex();
 
-            string[] arrays = new string[ResourceManager.Instance.LiveDataVector.EnabledCount];
+            string[] arrays = new string[Manager.LiveDataVector.EnabledCount];
 
             for (int i = 0; i < arrays.Length; i++)
             {
-                int index = ResourceManager.Instance.LiveDataVector.EnabledIndex(i);
-                Core.LiveData ld = ResourceManager.Instance.LiveDataVector[index];
+                int index = Manager.LiveDataVector.EnabledIndex(i);
+                Core.LiveData ld = Manager.LiveDataVector[index];
                 arrays[i] = ld.ShortName + " : " + ld.Content;
             }
 
@@ -80,10 +80,10 @@ namespace JM.QingQi.AndroidUI
                 arrays
             );
 
-            for (int i = 0; i < ResourceManager.Instance.LiveDataVector.EnabledCount; i++)
+            for (int i = 0; i < Manager.LiveDataVector.EnabledCount; i++)
             {
-                int index = ResourceManager.Instance.LiveDataVector.EnabledIndex(i);
-                ListView.SetItemChecked(i, ResourceManager.Instance.LiveDataVector[index].Showed);
+                int index = Manager.LiveDataVector.EnabledIndex(i);
+                ListView.SetItemChecked(i, Manager.LiveDataVector[index].Showed);
             }
         }
 
@@ -95,7 +95,7 @@ namespace JM.QingQi.AndroidUI
 
         void ValueBtnClick(object sender, EventArgs e)
         {
-            ResourceManager.Instance.LiveDataVector.DeployShowedIndex();
+            Manager.LiveDataVector.DeployShowedIndex();
             Intent intent = new Intent(this, typeof(DataStreamActivity));
             intent.PutExtra("Model", model);
             StartActivity(intent);

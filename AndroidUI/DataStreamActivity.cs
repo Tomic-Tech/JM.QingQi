@@ -86,7 +86,7 @@ namespace JM.QingQi.AndroidUI
         {
             RunOnUiThread(() =>
             {
-                Core.LiveDataVector vec = ResourceManager.Instance.LiveDataVector;
+                Core.LiveDataVector vec = Manager.LiveDataVector;
                 int position = vec.ShowedPosition(ld.Index);
 
                 TableRow row = (TableRow)layout.GetChildAt(position);
@@ -100,7 +100,7 @@ namespace JM.QingQi.AndroidUI
         private void PreparePage()
         {
             status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
-            Core.LiveDataVector vec = ResourceManager.Instance.LiveDataVector;
+            Core.LiveDataVector vec = Manager.LiveDataVector;
             for (int i = 0; i < vec.ShowedCount; i++)
             {
                 TextView content = new TextView(this);
@@ -153,14 +153,14 @@ namespace JM.QingQi.AndroidUI
 
         private void OnMikuniProtocol()
         {
-            ResourceManager.Instance.LiveDataVector.DeployEnabledIndex();
-            ResourceManager.Instance.LiveDataVector.DeployShowedIndex();
+            Manager.LiveDataVector.DeployEnabledIndex();
+            Manager.LiveDataVector.DeployShowedIndex();
             PreparePage();
 
             task = Task.Factory.StartNew(() =>
             {
                 mikuni = new Mikuni(Diag.BoxFactory.Instance.Commbox);
-                mikuni.ReadDataStream(ResourceManager.Instance.LiveDataVector);
+                mikuni.ReadDataStream(Manager.LiveDataVector);
             });
 
             task.ContinueWith(ShowFault);
@@ -176,7 +176,7 @@ namespace JM.QingQi.AndroidUI
 
         private void OnSynerjectProtocol()
         {
-            Core.LiveDataVector vec = ResourceManager.Instance.LiveDataVector;
+            Core.LiveDataVector vec = Manager.LiveDataVector;
             for (int i = 0; i < vec.Count; i++)
             {
                 if (model == StaticString.beforeBlank + Database.GetText("QM125T-8H", "QingQi"))
@@ -256,7 +256,7 @@ namespace JM.QingQi.AndroidUI
             task = Task.Factory.StartNew(() =>
             {
                 synerject = new Synerject(Diag.BoxFactory.Instance.Commbox);
-                synerject.ReadDataStream(ResourceManager.Instance.LiveDataVector);
+                synerject.ReadDataStream(Manager.LiveDataVector);
             });
 
             task.ContinueWith(ShowFault);
@@ -272,14 +272,14 @@ namespace JM.QingQi.AndroidUI
 
         private void OnVisteonProtocol()
         {
-            ResourceManager.Instance.LiveDataVector.DeployEnabledIndex();
-            ResourceManager.Instance.LiveDataVector.DeployShowedIndex();
+            Manager.LiveDataVector.DeployEnabledIndex();
+            Manager.LiveDataVector.DeployShowedIndex();
             PreparePage();
 
             task = Task.Factory.StartNew(() =>
             {
                 visteon = new Visteon(Diag.BoxFactory.Instance.Commbox);
-                visteon.ReadDataStream(ResourceManager.Instance.LiveDataVector);
+                visteon.ReadDataStream(Manager.LiveDataVector);
             });
 
             task.ContinueWith(ShowFault);
@@ -295,8 +295,8 @@ namespace JM.QingQi.AndroidUI
 
         private void OnVisteonFreezeProtocol()
         {
-			ResourceManager.Instance.LiveDataVector.DeployEnabledIndex();
-			ResourceManager.Instance.LiveDataVector.DeployShowedIndex();
+			Manager.LiveDataVector.DeployEnabledIndex();
+			Manager.LiveDataVector.DeployShowedIndex();
             PreparePage();
 
             status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
@@ -304,7 +304,7 @@ namespace JM.QingQi.AndroidUI
             task = Task.Factory.StartNew(() =>
             {
                 visteon = new Visteon(Diag.BoxFactory.Instance.Commbox);
-                visteon.ReadFreezeFrame(ResourceManager.Instance.LiveDataVector);
+                visteon.ReadFreezeFrame(Manager.LiveDataVector);
             });
 
             task.ContinueWith(ShowFault);

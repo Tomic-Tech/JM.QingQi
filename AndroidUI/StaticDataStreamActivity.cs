@@ -52,10 +52,10 @@ namespace JM.QingQi.AndroidUI
         private void OnMikuniProtocol()
         {
             status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
-            Core.LiveDataVector vec = ResourceManager.Instance.LiveDataVector;
+            Core.LiveDataVector vec = Manager.LiveDataVector;
             task = Task.Factory.StartNew(() =>
             {
-                Mikuni protocol = new Mikuni(ResourceManager.Instance.Commbox);
+                Mikuni protocol = new Mikuni(Manager.Commbox);
                 protocol.StaticDataStream(vec);
             });
 
@@ -68,7 +68,7 @@ namespace JM.QingQi.AndroidUI
         private void OnSynerjectProtocol()
         {
             status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
-            Core.LiveDataVector vec = ResourceManager.Instance.LiveDataVector;
+            Core.LiveDataVector vec = Manager.LiveDataVector;
 
             for (int i = 0; i < vec.Count; i++)
             {
@@ -143,7 +143,7 @@ namespace JM.QingQi.AndroidUI
             vec.DeployEnabledIndex();
             task = Task.Factory.StartNew(() =>
             {
-                Synerject protocol = new Synerject(ResourceManager.Instance.Commbox);
+                Synerject protocol = new Synerject(Manager.Commbox);
                 protocol.StaticDataStream(vec);
             });
 
@@ -156,10 +156,10 @@ namespace JM.QingQi.AndroidUI
         private void OnVisteonProtocol()
         {
             status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
-            Core.LiveDataVector vec = ResourceManager.Instance.LiveDataVector;
+            Core.LiveDataVector vec = Manager.LiveDataVector;
             task = Task.Factory.StartNew(() =>
             {
-                Visteon protocol = new Visteon(ResourceManager.Instance.Commbox);
+                Visteon protocol = new Visteon(Manager.Commbox);
                 protocol.StaticDataStream(vec);
             });
 
@@ -171,7 +171,7 @@ namespace JM.QingQi.AndroidUI
 
         private void ShowResult(Task t)
         {
-            Core.LiveDataVector vec = ResourceManager.Instance.LiveDataVector;
+            Core.LiveDataVector vec = Manager.LiveDataVector;
             RunOnUiThread(() =>
             {
                 if (t.IsFaulted)
