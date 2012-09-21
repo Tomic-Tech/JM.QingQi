@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Android.App;
 using Android.Content;
+using JM.Core;
 
 namespace JM.QingQi.AndroidUI
 {
@@ -19,7 +20,7 @@ namespace JM.QingQi.AndroidUI
         public static AlertDialog ShowFatal(Context cxt, string msg, EventHandler<DialogClickEventArgs> listener)
         {
             AlertDialog fatal = new AlertDialog.Builder(cxt).SetMessage(msg)
-                .SetPositiveButton(Vehicle.ResourceManager.Instance.VehicleDB.GetText("OK"),listener)
+                .SetPositiveButton(Database.GetText("OK", "System"),listener)
                 .Create();
             fatal.Show();
             return fatal;
@@ -32,7 +33,7 @@ namespace JM.QingQi.AndroidUI
             {
                 which = w.Which;
             })
-                .SetPositiveButton(Vehicle.ResourceManager.Instance.VehicleDB.GetText("OK"), listener)
+                .SetPositiveButton(Database.GetText("OK", "System"), listener)
                 .Create();
             list.Show();
             return list;

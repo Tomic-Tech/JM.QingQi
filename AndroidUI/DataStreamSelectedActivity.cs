@@ -10,6 +10,8 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 
+using JM.Core;
+using JM.Vehicles;
 using JM.QingQi.Vehicle;
 
 namespace JM.QingQi.AndroidUI
@@ -40,7 +42,7 @@ namespace JM.QingQi.AndroidUI
             layout1.Orientation = Orientation.Horizontal;
 
             valueBtn = new Button(this);
-            valueBtn.Text = Core.SysDB.GetText("Value");
+            valueBtn.Text = Database.GetText("Value", "System");
             valueBtn.Gravity = GravityFlags.CenterVertical;
             valueBtn.Click += new EventHandler(ValueBtnClick);
 

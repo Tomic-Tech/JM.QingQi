@@ -66,22 +66,36 @@ namespace JM.QingQi.AndroidUI
 
         private void CreateDirectory()
         {
-            sdcardPath = "/mnt/sdcard/JMScanner";
+            sdcardPath = Android.OS.Environment.ExternalStorageDirectory.Path;
+            sdcardPath += "/JMScanner";
+
             if (!Directory.Exists(sdcardPath))
             {
                 try
                 {
                     Directory.CreateDirectory(sdcardPath);
                 }
-                catch (Exception)
+                catch
                 {
-                    sdcardPath = "/sdcard/JMScanner";
-                    if (!Directory.Exists(sdcardPath))
-                    {
-                        Directory.CreateDirectory(sdcardPath);
-                    }
+                    this.Finish();
                 }
             }
+            //sdcardPath = "/mnt/sdcard/JMScanner";
+            //if (!Directory.Exists(sdcardPath))
+            //{
+            //    try
+            //    {
+            //        Directory.CreateDirectory(sdcardPath);
+            //    }
+            //    catch (Exception)
+            //    {
+            //        sdcardPath = "/sdcard/JMScanner";
+            //        if (!Directory.Exists(sdcardPath))
+            //        {
+            //            Directory.CreateDirectory(sdcardPath);
+            //        }
+            //    }
+            //}
         }
 
         private FileStream CreateSysDB()
@@ -93,14 +107,14 @@ namespace JM.QingQi.AndroidUI
             return File.Create(sdcardPath + "/sys.db");
         }
 
-        private FileStream CreateMikuniDB()
-        {
-            if (File.Exists(sdcardPath + "/QingQi.db"))
-            {
-                File.Delete(sdcardPath + "/QingQi.db");
-            }
-            return File.Create(sdcardPath + "/QingQi.db");
-        }
+        //private FileStream CreateMikuniDB()
+        //{
+        //    if (File.Exists(sdcardPath + "/QingQi.db"))
+        //    {
+        //        File.Delete(sdcardPath + "/QingQi.db");
+        //    }
+        //    return File.Create(sdcardPath + "/QingQi.db");
+        //}
 
         private FileStream CreateDat()
         {
@@ -134,14 +148,14 @@ namespace JM.QingQi.AndroidUI
             CopyFile(sr, sysFS);
         }
 
-        private void CopyMikuniDB(FileStream mikuniFS)
-        {
-            Stream sr = Assets.Open(
-                "QingQi.db",
-                Android.Content.Res.Access.Buffer
-            );
-            CopyFile(sr, mikuniFS);
-        }
+        //private void CopyMikuniDB(FileStream mikuniFS)
+        //{
+        //    Stream sr = Assets.Open(
+        //        "QingQi.db",
+        //        Android.Content.Res.Access.Buffer
+        //    );
+        //    CopyFile(sr, mikuniFS);
+        //}
 
         private void CopyDat(FileStream datFS)
         {
@@ -157,16 +171,14 @@ namespace JM.QingQi.AndroidUI
             CreateDirectory();
 
             FileStream sysFS = CreateSysDB();
-            FileStream mikuniFS = CreateMikuniDB();
+            //FileStream mikuniFS = CreateMikuniDB();
             FileStream datFS = CreateDat();
 
             CopySysDB(sysFS);
-            CopyMikuniDB(mikuniFS);
+            //CopyMikuniDB(mikuniFS);
             CopyDat(datFS);
 
             Core.MustCallFirst.Instance.Init(sdcardPath + "/");
-
-            ResourceManager.Instance.VehicleDB = new Core.VehicleDB(sdcardPath + "/QingQi.db");
         }
 
         public static void CreateShortCut(Activity act, int iconResId, int appnameResId)

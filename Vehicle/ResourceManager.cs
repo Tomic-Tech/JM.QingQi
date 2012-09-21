@@ -18,20 +18,12 @@ namespace JM.QingQi.Vehicle
             get { return instance; }
         }
 
-        private Core.VehicleDB vehicleDB;
         private Core.LiveDataVector liveDataVector;
 
         private ResourceManager()
         {
             Diag.BoxFactory.Instance.Version = Diag.BoxVersion.W80;
             Diag.BoxFactory.Instance.StreamType = Diag.StreamType.SerialPort;
-            VehicleDB = null;
-        }
-
-        public Core.VehicleDB VehicleDB
-        {
-            get { return vehicleDB; }
-            set { vehicleDB = value; }
         }
 
         public Diag.ICommbox Commbox

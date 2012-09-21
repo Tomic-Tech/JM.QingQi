@@ -12,6 +12,8 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 
+using JM.Core;
+using JM.Vehicles;
 using JM.QingQi.Vehicle;
 
 namespace JM.QingQi.AndroidUI
@@ -41,24 +43,24 @@ namespace JM.QingQi.AndroidUI
             layout.RemoveAllViews();
 
             protocolFuncs = new Dictionary<string, ProtocolFunc>();
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")] = OnSynerjectProtocol;
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200GY-F")] = OnMikuniProtocol;
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250GY")] = OnSynerjectProtocol;
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250T")] = OnSynerjectProtocol;
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200-3D")] = OnMikuniProtocol;
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200J-3L")] = OnMikuniProtocol;
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250J-2L")] = OnVisteonProtocol;
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250J-2L") + "Freeze"] = OnVisteonFreezeProtocol;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM125T-8H", "QingQi")] = OnSynerjectProtocol;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM200GY-F", "QingQi")] = OnMikuniProtocol;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM250GY", "QingQi")] = OnSynerjectProtocol;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM250T", "QingQi")] = OnSynerjectProtocol;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM200-3D", "QingQi")] = OnMikuniProtocol;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM200J-3L", "QingQi")] = OnMikuniProtocol;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM250J-2L", "QingQi")] = OnVisteonProtocol;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM250J-2L", "QingQi") + "Freeze"] = OnVisteonFreezeProtocol;
 
             backFuncs = new Dictionary<string, ProtocolFunc>();
-            backFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")] = OnSynerjectBack;
-            backFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200GY-F")] = OnMikuniBack;
-            backFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250GY")] = OnSynerjectBack;
-            backFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250T")] = OnSynerjectBack;
-            backFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200-3D")] = OnMikuniBack;
-            backFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200J-3L")] = OnMikuniBack;
-            backFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250J-2L")] = OnVisteonBack;
-            backFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250J-2L") + "Freeze"] = OnVisteonFreezeBack;
+            backFuncs[StaticString.beforeBlank + Database.GetText("QM125T-8H", "QingQi")] = OnSynerjectBack;
+            backFuncs[StaticString.beforeBlank + Database.GetText("QM200GY-F", "QingQi")] = OnMikuniBack;
+            backFuncs[StaticString.beforeBlank + Database.GetText("QM250GY", "QingQi")] = OnSynerjectBack;
+            backFuncs[StaticString.beforeBlank + Database.GetText("QM250T", "QingQi")] = OnSynerjectBack;
+            backFuncs[StaticString.beforeBlank + Database.GetText("QM200-3D", "QingQi")] = OnMikuniBack;
+            backFuncs[StaticString.beforeBlank + Database.GetText("QM200J-3L", "QingQi")] = OnMikuniBack;
+            backFuncs[StaticString.beforeBlank + Database.GetText("QM250J-2L", "QingQi")] = OnVisteonBack;
+            backFuncs[StaticString.beforeBlank + Database.GetText("QM250J-2L", "QingQi") + "Freeze"] = OnVisteonFreezeBack;
         }
 
         protected override void OnStart()
@@ -72,7 +74,7 @@ namespace JM.QingQi.AndroidUI
         {
             if (keyCode == Keycode.Back)
             {
-                status = DialogManager.ShowStatus(this, JM.Core.SysDB.GetText("Communicating"));
+                status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
                 backFuncs[model]();
                 this.Finish();
                 return true;
@@ -97,7 +99,7 @@ namespace JM.QingQi.AndroidUI
 
         private void PreparePage()
         {
-            status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+            status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
             Core.LiveDataVector vec = ResourceManager.Instance.LiveDataVector;
             for (int i = 0; i < vec.ShowedCount; i++)
             {
@@ -157,7 +159,7 @@ namespace JM.QingQi.AndroidUI
 
             task = Task.Factory.StartNew(() =>
             {
-                mikuni = new Mikuni(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                mikuni = new Mikuni(Diag.BoxFactory.Instance.Commbox);
                 mikuni.ReadDataStream(ResourceManager.Instance.LiveDataVector);
             });
 
@@ -177,7 +179,7 @@ namespace JM.QingQi.AndroidUI
             Core.LiveDataVector vec = ResourceManager.Instance.LiveDataVector;
             for (int i = 0; i < vec.Count; i++)
             {
-                if (model == StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM125T-8H"))
+                if (model == StaticString.beforeBlank + Database.GetText("QM125T-8H", "QingQi"))
                 {
                     if ((vec[i].ShortName == "CRASH") ||
                         (vec[i].ShortName == "DIST_ACT_MIL") ||
@@ -200,7 +202,7 @@ namespace JM.QingQi.AndroidUI
                         vec[i].Enabled = false;
                     }
                 }
-                else if (model == StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250GY"))
+                else if (model == StaticString.beforeBlank + Database.GetText("QM250GY", "QingQi"))
                 {
                     if ((vec[i].ShortName == "CRASH") ||
                         (vec[i].ShortName == "DIST_ACT_MIL") ||
@@ -223,7 +225,7 @@ namespace JM.QingQi.AndroidUI
                         vec[i].Enabled = false;
                     }
                 }
-                else if (model == StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250T"))
+                else if (model == StaticString.beforeBlank + Database.GetText("QM250T", "QingQi"))
                 {
                     if ((vec[i].ShortName == "CRASH") ||
                         (vec[i].ShortName == "DIST_ACT_MIL") ||
@@ -253,7 +255,7 @@ namespace JM.QingQi.AndroidUI
 
             task = Task.Factory.StartNew(() =>
             {
-                synerject = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                synerject = new Synerject(Diag.BoxFactory.Instance.Commbox);
                 synerject.ReadDataStream(ResourceManager.Instance.LiveDataVector);
             });
 
@@ -276,7 +278,7 @@ namespace JM.QingQi.AndroidUI
 
             task = Task.Factory.StartNew(() =>
             {
-                visteon = new Visteon(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                visteon = new Visteon(Diag.BoxFactory.Instance.Commbox);
                 visteon.ReadDataStream(ResourceManager.Instance.LiveDataVector);
             });
 
@@ -297,11 +299,11 @@ namespace JM.QingQi.AndroidUI
 			ResourceManager.Instance.LiveDataVector.DeployShowedIndex();
             PreparePage();
 
-            status = DialogManager.ShowStatus(this, JM.Core.SysDB.GetText("Communicating"));
+            status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
 
             task = Task.Factory.StartNew(() =>
             {
-                visteon = new Visteon(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                visteon = new Visteon(Diag.BoxFactory.Instance.Commbox);
                 visteon.ReadFreezeFrame(ResourceManager.Instance.LiveDataVector);
             });
 

@@ -11,6 +11,8 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 
+using JM.Core;
+using JM.Vehicles;
 using JM.QingQi.Vehicle;
 
 namespace JM.QingQi.AndroidUI
@@ -28,13 +30,13 @@ namespace JM.QingQi.AndroidUI
         public ActiveTestActivity()
         {
             protocolFuncs = new Dictionary<string, ProtocolFunc>();
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")] = OnSynerject;
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200GY-F")] = null;
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250GY")] = OnSynerject;
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250T")] = OnSynerject;
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200-3D")] = null;
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200J-3L")] = null;
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250J-2L")] = null;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM125T-8H", "QingQi")] = OnSynerject;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM200GY-F", "QingQi")] = null;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM250GY", "QingQi")] = OnSynerject;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM250T", "QingQi")] = OnSynerject;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM200-3D", "QingQi")] = null;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM200J-3L", "QingQi")] = null;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM250J-2L", "QingQi")] = null;
         }
 
         protected override void OnStart()
@@ -57,9 +59,9 @@ namespace JM.QingQi.AndroidUI
         private void OnSynerject()
         {
             string[] arrays = new string[3];
-            arrays[0] = ResourceManager.Instance.VehicleDB.GetText("Injector");
-            arrays[1] = ResourceManager.Instance.VehicleDB.GetText("Ignition Coil");
-            arrays[2] = ResourceManager.Instance.VehicleDB.GetText("Fuel Pump");
+            arrays[0] = Database.GetText("Injector", "System");
+            arrays[1] = Database.GetText("Ignition Coil", "System");
+            arrays[2] = Database.GetText("Fuel Pump", "System");
 
             ListAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, arrays);
             ListView.ItemClick += OnItemClickSynerject;
@@ -83,12 +85,12 @@ namespace JM.QingQi.AndroidUI
 
         private void OnItemClickSynerject(object sender, AdapterView.ItemClickEventArgs e)
         {
-            if (((TextView)e.View).Text == ResourceManager.Instance.VehicleDB.GetText("Injector"))
+            if (((TextView)e.View).Text == Database.GetText("Injector", "System"))
             {
                 string[] arrays = new string[]
                 {
-                    ResourceManager.Instance.VehicleDB.GetText("Injector On Test"),
-                    ResourceManager.Instance.VehicleDB.GetText("Injector Off Test"),
+                    Database.GetText("Injector On Test", "QingQi"),
+                    Database.GetText("Injector Off Test", "QingQi"),
                 };
                 DialogManager.ShowList(this, arrays, (sender2, e2) =>
                 {
@@ -97,24 +99,24 @@ namespace JM.QingQi.AndroidUI
                         return;
                     }
 
-                    status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+                    status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
                     
                     Task task = Task.Factory.StartNew(() =>
                     {
-                        Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
-                        result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Injector"), DialogManager.Which == 0 ? true : false);
+                        Synerject protocol = new Synerject(Diag.BoxFactory.Instance.Commbox);
+                        result = protocol.Active(Database.GetText("Injector", "System"), DialogManager.Which == 0 ? true : false);
                     });
 
                     task.ContinueWith(ShowResult);
                 }
                 );
             }
-            else if (((TextView)e.View).Text == ResourceManager.Instance.VehicleDB.GetText("Ignition Coil"))
+            else if (((TextView)e.View).Text == Database.GetText("Ignition Coil", "System"))
             {
                 string[] arrays = new string[]
                 {
-                    ResourceManager.Instance.VehicleDB.GetText("Ignition Coil On Test"),
-                    ResourceManager.Instance.VehicleDB.GetText("Ignition Coil Off Test"),
+                    Database.GetText("Ignition Coil On Test", "QingQi"),
+                    Database.GetText("Ignition Coil Off Test", "QingQi"),
                 };
                 DialogManager.ShowList(this, arrays, (sender2, e2) =>
                 {
@@ -123,24 +125,24 @@ namespace JM.QingQi.AndroidUI
                         return;
                     }
 
-                    status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+                    status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
                     
                     Task task = Task.Factory.StartNew(() =>
                     {
-                        Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
-                        result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Ignition Coil"), DialogManager.Which == 0 ? true : false);
+                        Synerject protocol = new Synerject(Diag.BoxFactory.Instance.Commbox);
+                        result = protocol.Active(Database.GetText("Ignition Coil", "System"), DialogManager.Which == 0 ? true : false);
                     }
                     );
                     task.ContinueWith(ShowResult);
                 }
                 );
             }
-            else if (((TextView)e.View).Text == ResourceManager.Instance.VehicleDB.GetText("Fuel Pump"))
+            else if (((TextView)e.View).Text == Database.GetText("Fuel Pump", "System"))
             {   
                 string[] arrays = new string[]
                 {
-                    ResourceManager.Instance.VehicleDB.GetText("Fuel Pump On Test"),
-                    ResourceManager.Instance.VehicleDB.GetText("Fuel Pump Off Test"),
+                    Database.GetText("Fuel Pump On Test", "QingQi"),
+                    Database.GetText("Fuel Pump Off Test", "QingQi"),
                 };
                 DialogManager.ShowList(this, arrays, (sender2, e2) =>
                 {
@@ -149,12 +151,12 @@ namespace JM.QingQi.AndroidUI
                         return;
                     }
 
-                    status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+                    status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
 
                     Task task = Task.Factory.StartNew(() =>
                     {
-                        Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
-                        result = protocol.Active(ResourceManager.Instance.VehicleDB.GetText("Fuel Pump"), DialogManager.Which == 0 ? true : false);
+                        Synerject protocol = new Synerject(Diag.BoxFactory.Instance.Commbox);
+                        result = protocol.Active(Database.GetText("Fuel Pump", "System"), DialogManager.Which == 0 ? true : false);
                     }
                     );
 

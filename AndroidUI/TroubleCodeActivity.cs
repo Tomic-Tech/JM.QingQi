@@ -12,6 +12,8 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 
+using JM.Core;
+using JM.Vehicles;
 using JM.QingQi.Vehicle;
 
 namespace JM.QingQi.AndroidUI
@@ -38,13 +40,13 @@ namespace JM.QingQi.AndroidUI
         public TroubleCodeActivity()
         {
             protocolFuncs = new Dictionary<string, ProtocolFunc>();
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")] = OnSynerjectProtocol;
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200GY-F")] = OnMikuniProtocol;
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250GY")] = OnSynerjectProtocol;
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250T")] = OnSynerjectProtocol;
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200-3D")] = OnMikuniProtocol;
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM200J-3L")] = OnMikuniProtocol;
-            protocolFuncs[StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250J-2L")] = OnVisteonProtocol;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM125T-8H", "QingQi")] = OnSynerjectProtocol;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM200GY-F", "QingQi")] = OnMikuniProtocol;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM250GY", "QingQi")] = OnSynerjectProtocol;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM250T", "QingQi")] = OnSynerjectProtocol;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM200-3D", "QingQi")] = OnMikuniProtocol;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM200J-3L", "QingQi")] = OnMikuniProtocol;
+            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM250J-2L", "QingQi")] = OnVisteonProtocol;
         }
 
         protected override void OnCreate(Bundle bundle)
@@ -81,7 +83,7 @@ namespace JM.QingQi.AndroidUI
                 }
                 else if (uiStatus == UIStatus.Result)
                 {
-                    if (model == StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250J-2L"))
+                    if (model == StaticString.beforeBlank + Database.GetText("QM250J-2L", "QingQi"))
                     {
                         this.Finish();
                         return true;
@@ -92,9 +94,9 @@ namespace JM.QingQi.AndroidUI
                         ListView.ItemClick -= OnItemClickMikuni;
                         ListView.ItemClick -= OnItemClickSynerject;
                         ListView.ItemClick -= OnItemClickVisteon;
-                        if ((model == StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM125T-8H")) ||
-                            (model == StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250GY")) ||
-                            (model == StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("QM250T")))
+                        if ((model == StaticString.beforeBlank + Database.GetText("QM125T-8H", "QingQi")) ||
+                            (model == StaticString.beforeBlank + Database.GetText("QM250GY", "QingQi")) ||
+                            (model == StaticString.beforeBlank + Database.GetText("QM250T", "QingQi")))
                         {
                             OnSynerjectProtocol();
                         }
@@ -112,16 +114,16 @@ namespace JM.QingQi.AndroidUI
         private void OnMikuniProtocol()
         {
             string[] arrays = new string[2];
-            arrays[0] = StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read Current Trouble Code");
-            arrays[1] = StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read History Trouble Code");
+            arrays[0] = StaticString.beforeBlank + Database.GetText("Read Current Trouble Code", "System");
+            arrays[1] = StaticString.beforeBlank + Database.GetText("Read History Trouble Code", "System");
             ListView.Adapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, arrays);
             funcs = new Dictionary<string, ProtocolFunc>();
             funcs[arrays[0]] = () =>
             {
-                status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+                status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
                 Task task = Task.Factory.StartNew(() =>
                 {
-                    Mikuni protocol = new Mikuni(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                    Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox);
                     codes = protocol.ReadCurrentTroubleCode();
                 });
 
@@ -130,11 +132,11 @@ namespace JM.QingQi.AndroidUI
 
             funcs[arrays[1]] = () =>
             {
-                status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+                status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
 
                 Task task = Task.Factory.StartNew(() =>
                 {
-                    Mikuni protocol = new Mikuni(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                    Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox);
                     codes = protocol.ReadHistoryTroubleCode();
                 });
 
@@ -152,25 +154,25 @@ namespace JM.QingQi.AndroidUI
 
         private void OnSynerjectProtocol()
         {
-        //    status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+        //    status = DialogManager.ShowStatus(this, Database.GetText("Communicating"));
         //    Task task = Task.Factory.StartNew(() =>
         //    {
-        //        Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, ResourceManager.Instance.Commbox);
+        //        Synerject protocol = new Synerject(Database, ResourceManager.Instance.Commbox);
         //        codes = protocol.ReadTroubleCode();
         //    });
 
         //    task.ContinueWith(ShowResult);
             string[] arrays = new string[2];
-            arrays[0] = StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read Current Trouble Code");
-            arrays[1] = StaticString.beforeBlank + ResourceManager.Instance.VehicleDB.GetText("Read History Trouble Code");
+            arrays[0] = StaticString.beforeBlank + Database.GetText("Read Current Trouble Code", "System");
+            arrays[1] = StaticString.beforeBlank + Database.GetText("Read History Trouble Code", "System");
             ListView.Adapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, arrays);
             funcs = new Dictionary<string, ProtocolFunc>();
             funcs[arrays[0]] = () =>
             {
-                status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+                status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
                 Task task = Task.Factory.StartNew(() =>
                 {
-                    Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                    Synerject protocol = new Synerject(Diag.BoxFactory.Instance.Commbox);
                     codes = protocol.ReadTroubleCode(false);
                 });
 
@@ -179,11 +181,11 @@ namespace JM.QingQi.AndroidUI
 
             funcs[arrays[1]] = () =>
             {
-                status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+                status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
 
                 Task task = Task.Factory.StartNew(() =>
                 {
-                    Synerject protocol = new Synerject(ResourceManager.Instance.VehicleDB, Diag.BoxFactory.Instance.Commbox);
+                    Synerject protocol = new Synerject(Diag.BoxFactory.Instance.Commbox);
                     codes = protocol.ReadTroubleCode(true);
                 });
 
@@ -199,16 +201,16 @@ namespace JM.QingQi.AndroidUI
             //text.Append(model);
             //text.Append(" ");
             //text.Append(((TextView)e.View).Text);
-            //Toast.MakeText(this, ResourceManager.Instance.VehicleDB.GetText(text.ToString()), ToastLength.Long).Show();
+            //Toast.MakeText(this, Database.GetText(text.ToString()), ToastLength.Long).Show();
             funcs[((TextView)e.View).Text]();
         }
 
         private void OnVisteonProtocol()
         {
-            status = DialogManager.ShowStatus(this, ResourceManager.Instance.VehicleDB.GetText("Communicating"));
+            status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
             Task task = Task.Factory.StartNew(() =>
             {
-                Visteon protocol = new Visteon(ResourceManager.Instance.VehicleDB, ResourceManager.Instance.Commbox);
+                Visteon protocol = new Visteon(ResourceManager.Instance.Commbox);
                 codes = protocol.ReadTroubleCode();
             });
 
@@ -217,20 +219,20 @@ namespace JM.QingQi.AndroidUI
 
         private void OnItemClickVisteon(object sender, AdapterView.ItemClickEventArgs e)
         {
-            StringBuilder text = new StringBuilder();
-            text.Append(model);
-            text.Append(" ");
-            text.Append(((TextView)e.View).Text);
-            Toast.MakeText(this, ResourceManager.Instance.VehicleDB.GetText(text.ToString()), ToastLength.Long).Show();
+            //StringBuilder text = new StringBuilder();
+            //text.Append(model);
+            //text.Append(" ");
+            //text.Append(((TextView)e.View).Text);
+            Toast.MakeText(this, codes[e.Position].Description, ToastLength.Long).Show();
         }
 
         private void OnTroubleCodeItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
-            StringBuilder text = new StringBuilder();
-            text.Append(model);
-            text.Append(" ");
-            text.Append(((TextView)e.View).Text);
-            Toast.MakeText(this, ResourceManager.Instance.VehicleDB.GetText(text.ToString()), ToastLength.Long).Show();
+            //StringBuilder text = new StringBuilder();
+            //text.Append(model);
+            //text.Append(" ");
+            //text.Append(((TextView)e.View).Text);
+            Toast.MakeText(this, codes[e.Position].Description, ToastLength.Long).Show();
         }
 
         private void ShowTroubleCode()
