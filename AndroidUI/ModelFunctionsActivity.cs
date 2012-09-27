@@ -103,7 +103,9 @@ namespace JM.QingQi.AndroidUI
 
                 Task task = Task.Factory.StartNew(() =>
                 {
-                    Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox);
+                    Diag.MikuniOptions options = new Diag.MikuniOptions();
+                    options.Parity = Diag.MikuniParity.Even;
+                    Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox, options);
                     protocol.ClearTroubleCode();
                 });
 
@@ -156,7 +158,9 @@ namespace JM.QingQi.AndroidUI
                 string version = "";
                 Task task = Task.Factory.StartNew(() =>
                 {
-                    Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox);
+                    Diag.MikuniOptions options = new Diag.MikuniOptions();
+                    options.Parity = Diag.MikuniParity.Even;
+                    Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox, options);
                     version = Manager.ForamtECUVersion(protocol.GetECUVersion());
                 });
 
@@ -197,7 +201,9 @@ namespace JM.QingQi.AndroidUI
 
                 Task task = Task.Factory.StartNew(() =>
                 {
-                    Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox);
+                    Diag.MikuniOptions options = new Diag.MikuniOptions();
+                    options.Parity = Diag.MikuniParity.Even;
+                    Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox, options);
                     protocol.TPSIdleSetting();
                 });
 
@@ -226,7 +232,9 @@ namespace JM.QingQi.AndroidUI
 
                 Task task = Task.Factory.StartNew(() =>
                 {
-                    Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox);
+                    Diag.MikuniOptions options = new Diag.MikuniOptions();
+                    options.Parity = Diag.MikuniParity.Even;
+                    Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox, options);
                     protocol.LongTermLearnValueZoneInitialization();
                 });
 
@@ -255,7 +263,9 @@ namespace JM.QingQi.AndroidUI
 
                 Task task = Task.Factory.StartNew(() =>
                 {
-                    Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox);
+                    Diag.MikuniOptions options = new Diag.MikuniOptions();
+                    options.Parity = Diag.MikuniParity.Even;
+                    Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox, options);
                     protocol.ISCLearnValueInitialize();
                 });
 

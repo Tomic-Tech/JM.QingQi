@@ -123,7 +123,9 @@ namespace JM.QingQi.AndroidUI
                 status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
                 Task task = Task.Factory.StartNew(() =>
                 {
-                    Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox);
+                    Diag.MikuniOptions options = new Diag.MikuniOptions();
+                    options.Parity = Diag.MikuniParity.Even;
+                    Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox, options);
                     codes = protocol.ReadCurrentTroubleCode();
                 });
 
@@ -136,7 +138,9 @@ namespace JM.QingQi.AndroidUI
 
                 Task task = Task.Factory.StartNew(() =>
                 {
-                    Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox);
+                    Diag.MikuniOptions options = new Diag.MikuniOptions();
+                    options.Parity = Diag.MikuniParity.Even;
+                    Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox, options);
                     codes = protocol.ReadHistoryTroubleCode();
                 });
 

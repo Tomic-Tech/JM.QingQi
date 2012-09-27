@@ -159,7 +159,9 @@ namespace JM.QingQi.AndroidUI
 
             task = Task.Factory.StartNew(() =>
             {
-                mikuni = new Mikuni(Diag.BoxFactory.Instance.Commbox);
+                Diag.MikuniOptions options = new Diag.MikuniOptions();
+                options.Parity = Diag.MikuniParity.Even;
+                mikuni = new Mikuni(Diag.BoxFactory.Instance.Commbox, options);
                 mikuni.ReadDataStream(Manager.LiveDataVector);
             });
 

@@ -55,7 +55,9 @@ namespace JM.QingQi.AndroidUI
             Core.LiveDataVector vec = Manager.LiveDataVector;
             task = Task.Factory.StartNew(() =>
             {
-                Mikuni protocol = new Mikuni(Manager.Commbox);
+                Diag.MikuniOptions options = new Diag.MikuniOptions();
+                options.Parity = Diag.MikuniParity.Even;
+                Mikuni protocol = new Mikuni(Manager.Commbox, options);
                 protocol.StaticDataStream(vec);
             });
 
