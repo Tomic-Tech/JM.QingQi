@@ -155,13 +155,13 @@ namespace JM.QingQi.AndroidUI
             {
                 ProgressDialog status = DialogManager.ShowStatus(this, Database.GetText("Reading ECU Version, Please Wait", "System"));
                 AlertDialog fatal;
-                string version = "";
+                Mikuni.ChineseVersion version = new Mikuni.ChineseVersion();
                 Task task = Task.Factory.StartNew(() =>
                 {
                     Diag.MikuniOptions options = new Diag.MikuniOptions();
                     options.Parity = Diag.MikuniParity.Even;
                     Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox, options);
-                    version = Manager.ForamtECUVersion(protocol.GetECUVersion());
+                    version = Mikuni.FormatECUVersionForChina(protocol.GetECUVersion());
                 });
 
                 task.ContinueWith((t) =>
@@ -169,6 +169,7 @@ namespace JM.QingQi.AndroidUI
                     RunOnUiThread(() =>
                     {
                         status.Dismiss();
+                        string text = "";
                         if (t.IsFaulted)
                         {
                             fatal = DialogManager.ShowFatal(this, t.Exception.InnerException.Message, null);
@@ -177,18 +178,20 @@ namespace JM.QingQi.AndroidUI
                         {
 							if (model == (StaticString.beforeBlank + Database.GetText("QM200GY-F", "QingQi")))
 							{
-								version = "M16-01\n" + version;
+                                text = "M16-01\n";
                             }
                             else if (model == (StaticString.beforeBlank + Database.GetText("QM200J-3L", "QingQi")))
 							{
-								version = "M16-00\n" + version;
+                                text = "M16-00\n";
 							}
                             else if (model == (StaticString.beforeBlank + Database.GetText("QM200-3D", "QingQi")))
 							{
-								version = "M16-02\n" + version;
+                                text = "M16-02\n";
 							}
-                            fatal = DialogManager.ShowFatal(this, version, null);
+                            text += version.Hardware + "\nV" + version.Software;
+                            fatal = DialogManager.ShowFatal(this, text, null);
                         }
+                        
                     });
                 });
             }
