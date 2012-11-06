@@ -80,7 +80,7 @@ namespace JM.QingQi.AndroidUI
             arrays.Add(StaticString.beforeBlank + Database.GetText("Read Trouble Code", "System"));
             arrays.Add(StaticString.beforeBlank + Database.GetText("Clear Trouble Code", "System"));
             arrays.Add(StaticString.beforeBlank + Database.GetText("Read Data Stream", "System"));
-            arrays.Add(StaticString.beforeBlank + Database.GetText("Static Data Stream", "System"));
+            //arrays.Add(StaticString.beforeBlank + Database.GetText("Static Data Stream", "System"));
             //            arrays.Add(Database.GetText("Activity Test"));
             arrays.Add(StaticString.beforeBlank + Database.GetText("TPS Idle Adjustment", "Mikuni"));
             arrays.Add(StaticString.beforeBlank + Database.GetText("Long Term Learn Value Zone Initialization", "Mikuni"));
@@ -131,19 +131,19 @@ namespace JM.QingQi.AndroidUI
             funcs.Add(StaticString.beforeBlank + Database.GetText("Read Data Stream", "System"), () =>
             {
                 Manager.LiveDataVector = Database.GetLiveData("Mikuni");
-                Intent intent = new Intent(this, typeof(DataStreamActivity));
+                Intent intent = new Intent(this, typeof(DataStreamSelectedActivity));
                 intent.PutExtra("Model", model);
                 StartActivity(intent);
             }
             ); // Read Data Stream
 
-            funcs.Add(StaticString.beforeBlank + Database.GetText("Static Data Stream", "System"), () =>
-            {
-                Manager.LiveDataVector = Database.GetLiveData("Mikuni");
-                Intent intent = new Intent(this, typeof(StaticDataStreamActivity));
-                intent.PutExtra("Model", model);
-                StartActivity(intent);
-            });
+            //funcs.Add(StaticString.beforeBlank + Database.GetText("Static Data Stream", "System"), () =>
+            //{
+            //    Manager.LiveDataVector = Database.GetLiveData("Mikuni");
+            //    Intent intent = new Intent(this, typeof(StaticDataStreamActivity));
+            //    intent.PutExtra("Model", model);
+            //    StartActivity(intent);
+            //});
 
             funcs.Add(StaticString.beforeBlank + Database.GetText("Activity Test", "System"), () =>
             {
@@ -301,7 +301,7 @@ namespace JM.QingQi.AndroidUI
             arrays.Add(StaticString.beforeBlank + Database.GetText("Read Trouble Code", "System"));
             arrays.Add(StaticString.beforeBlank + Database.GetText("Clear Trouble Code", "System"));
             arrays.Add(StaticString.beforeBlank + Database.GetText("Read Data Stream", "System"));
-            arrays.Add(StaticString.beforeBlank + Database.GetText("Static Data Stream", "System"));
+            //arrays.Add(StaticString.beforeBlank + Database.GetText("Static Data Stream", "System"));
             if (model != StaticString.beforeBlank + Database.GetText("QM125T-8H", "QingQi"))
                 arrays.Add(StaticString.beforeBlank + Database.GetText("Activity Test", "System"));
             arrays.Add(StaticString.beforeBlank + Database.GetText("ECU Version", "System"));
@@ -349,19 +349,19 @@ namespace JM.QingQi.AndroidUI
             funcs.Add(StaticString.beforeBlank + Database.GetText("Read Data Stream", "System"), () =>
             {
                 Manager.LiveDataVector = Database.GetLiveData("Synerject");
-                Intent intent = new Intent(this, typeof(DataStreamActivity));
+                Intent intent = new Intent(this, typeof(DataStreamSelectedActivity));
                 intent.PutExtra("Model", model);
                 StartActivity(intent);
             }
             ); // Read Data Stream
 
-            funcs.Add(StaticString.beforeBlank + Database.GetText("Static Data Stream", "System"), () =>
-            {
-                Manager.LiveDataVector = Database.GetLiveData("Synerject");
-                Intent intent = new Intent(this, typeof(StaticDataStreamActivity));
-                intent.PutExtra("Model", model);
-                StartActivity(intent);
-            });
+            //funcs.Add(StaticString.beforeBlank + Database.GetText("Static Data Stream", "System"), () =>
+            //{
+            //    Manager.LiveDataVector = Database.GetLiveData("Synerject");
+            //    Intent intent = new Intent(this, typeof(StaticDataStreamActivity));
+            //    intent.PutExtra("Model", model);
+            //    StartActivity(intent);
+            //});
 
             funcs.Add(StaticString.beforeBlank + Database.GetText("Activity Test", "System"), () =>
             {
@@ -411,7 +411,7 @@ namespace JM.QingQi.AndroidUI
             arrays.Add(StaticString.beforeBlank + Database.GetText("Read Trouble Code", "System"));
             arrays.Add(StaticString.beforeBlank + Database.GetText("Clear Trouble Code", "System"));
             arrays.Add(StaticString.beforeBlank + Database.GetText("Read Data Stream", "System"));
-            arrays.Add(StaticString.beforeBlank + Database.GetText("Static Data Stream", "System"));
+            //arrays.Add(StaticString.beforeBlank + Database.GetText("Static Data Stream", "System"));
             arrays.Add(StaticString.beforeBlank + Database.GetText("Read Freeze Frame", "System"));
             //arrays.Add(Database.GetText("Activity Test"));
             //arrays.Add(Database.GetText("ECU Version"));
@@ -459,20 +459,20 @@ namespace JM.QingQi.AndroidUI
             funcs.Add(StaticString.beforeBlank + Database.GetText("Read Data Stream", "System"), () =>
             {
                 Manager.LiveDataVector = Database.GetLiveData("Visteon");
-                Intent intent = new Intent(this, typeof(DataStreamActivity));
+                Intent intent = new Intent(this, typeof(DataStreamSelectedActivity));
                 intent.PutExtra("Model", model);
                 StartActivity(intent);
 
             }
             ); // Read Data Stream
 
-            funcs.Add(StaticString.beforeBlank + Database.GetText("Static Data Stream", "System"), () =>
-            {
-                Manager.LiveDataVector = Database.GetLiveData("Visteon");
-                Intent intent = new Intent(this, typeof(StaticDataStreamActivity));
-                intent.PutExtra("Model", model);
-                StartActivity(intent);
-            });
+            //funcs.Add(StaticString.beforeBlank + Database.GetText("Static Data Stream", "System"), () =>
+            //{
+            //    Manager.LiveDataVector = Database.GetLiveData("Visteon");
+            //    Intent intent = new Intent(this, typeof(StaticDataStreamActivity));
+            //    intent.PutExtra("Model", model);
+            //    StartActivity(intent);
+            //});
 
             funcs.Add(StaticString.beforeBlank + Database.GetText("Read Freeze Frame", "System"), () =>
             {

@@ -196,7 +196,7 @@ namespace JM.QingQi.AndroidUI
             shortcutintent.PutExtra(Intent.ExtraShortcutIntent,
                     new Intent(act.ApplicationContext, act.Class));
             // 发送广播  
-            act.SendBroadcast(shortcutintent); 
+            act.SendBroadcast(shortcutintent);
         }
     }
 }

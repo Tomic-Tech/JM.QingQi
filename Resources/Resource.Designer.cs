@@ -136,6 +136,9 @@ namespace JM.QingQi
 		public partial class Style
 		{
 			
+			// aapt resource value: 0x7f050003
+			public const int Theme_AlertDialogCustom = 2131034115;
+			
 			// aapt resource value: 0x7f050001
 			public const int Theme_Default = 2131034113;
 			

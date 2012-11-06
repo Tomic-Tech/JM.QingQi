@@ -4,6 +4,7 @@ using System.Text;
 using Android.App;
 using Android.Content;
 using JM.Core;
+using Android.Views;
 
 namespace JM.QingQi.AndroidUI
 {
@@ -29,7 +30,7 @@ namespace JM.QingQi.AndroidUI
         public static AlertDialog ShowList(Context cxt, string[] arrays, EventHandler<DialogClickEventArgs> listener)
         {
             Which = -1;
-            AlertDialog list = new AlertDialog.Builder(cxt).SetSingleChoiceItems(arrays, -1, (dialog, w) =>
+            AlertDialog list = new AlertDialog.Builder(new ContextThemeWrapper(cxt, Resource.Style.Theme_AlertDialogCustom)).SetSingleChoiceItems(arrays, -1, (dialog, w) =>
             {
                 which = w.Which;
             })

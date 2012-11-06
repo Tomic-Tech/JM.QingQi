@@ -24,8 +24,8 @@ namespace JM.QingQi.AndroidUI
             ListView list = (ListView)FindViewById(Resource.Id.deviceInfoListView);
 
             string[] arrays = new string[2];
-            arrays[0] = GetString(Resource.String.Version) + "  :   1.0";
-            arrays[1] = GetString(Resource.String.DeviceID) + " :   ABC";
+            arrays[0] = StaticString.beforeBlank + GetString(Resource.String.Version) + "  :   1.0";
+            arrays[1] = StaticString.beforeBlank + GetString(Resource.String.DeviceID) + " :   ABC";
             list.Adapter = new ArrayAdapter<string>(
                 this,
                 Android.Resource.Layout.SimpleListItem1,

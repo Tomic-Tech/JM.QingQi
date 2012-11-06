@@ -20,101 +20,72 @@ namespace JM.QingQi.AndroidUI
     public class DataStreamSelectedActivity : ListActivity
     {
         private string model = null;
-        private Button valueBtn = null;
-        private LinearLayout layout1 = null;
-        private LinearLayout layout2 = null;
+        private delegate void Func();
+        private Dictionary<string, Func> funcs;
+
+        //private void PrepareLiveDataVector()
+        //{
+        //    if ((model == (StaticString.beforeBlank + Database.GetText("QM125T-8H", "QingQi"))) ||
+        //        (model == (StaticString.beforeBlank + Database.GetText("QM250GY", "QingQi"))) ||
+        //        (model == (StaticString.beforeBlank + Database.GetText("QM250T", "QingQi"))))
+        //    {
+        //        Manager.LiveDataVector = Database.GetLiveData("Synerject");
+        //    }
+        //    else if ((model == (StaticString.beforeBlank + Database.GetText("QM200GY-F", "QingQi"))) ||
+        //        (model == (StaticString.beforeBlank + Database.GetText("QM200-3D", "QingQi"))) ||
+        //        (model == (StaticString.beforeBlank + Database.GetText("QM200J-3L", "QingQi"))))
+        //    {
+        //        Manager.LiveDataVector = Database.GetLiveData("Mikuni");
+        //    }
+        //    else
+        //    {
+        //        Manager.LiveDataVector = Database.GetLiveData("Visteon");
+        //    }
+        //}
 
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
 
             // Create your application here
-            ListView.ChoiceMode = ChoiceMode.Multiple;
-            ListView.Focusable = true;
-            ListView.ItemsCanFocus = true;
-            ListView.ItemClick += (sender, e) =>
+            List<string> arrays = new List<string>();
+            arrays.Add(StaticString.beforeBlank + Database.GetText("Dynamic Data Stream", "System"));
+            arrays.Add(StaticString.beforeBlank + Database.GetText("Static Data Stream", "System"));
+
+            funcs = new Dictionary<string, Func>();
+            
+            funcs.Add(StaticString.beforeBlank + Database.GetText("Dynamic Data Stream", "System"), () => 
             {
-                int i = Manager.LiveDataVector.EnabledIndex(e.Position);
-                Manager.LiveDataVector[i].Showed = !Manager.LiveDataVector[i].Showed;
+                //PrepareLiveDataVector();
+                Intent intent = new Intent(this, typeof(DataStreamActivity));
+                intent.PutExtra("Model", model);
+                StartActivity(intent);
+            });
+            funcs.Add(StaticString.beforeBlank + Database.GetText("Static Data Stream", "System"), () => 
+            {
+                //PrepareLiveDataVector();
+                Intent intent = new Intent(this, typeof(StaticDataStreamActivity));
+                intent.PutExtra("Model", model);
+                StartActivity(intent);
+            });
+
+            ListAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, arrays);
+
+            ListView.ItemClick += (sender, e) => 
+            {
+                funcs[((TextView)e.View).Text]();
             };
-
-            layout1 = new LinearLayout(this);
-            layout1.Orientation = Orientation.Horizontal;
-
-            valueBtn = new Button(this);
-            valueBtn.Text = Database.GetText("Value", "System");
-            valueBtn.Gravity = GravityFlags.CenterVertical;
-            valueBtn.Click += new EventHandler(ValueBtnClick);
-
-            layout1.AddView(valueBtn, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FillParent, ViewGroup.LayoutParams.FillParent));
-
-            layout2 = new LinearLayout(this);
-            layout2.AddView(layout1, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent));
-
-            ListView.AddFooterView(layout2);
-
-            // Prepare the loader. Either re-connect with an existing one,
-            // or start a new one.
-
         }
 
         protected override void OnStart()
         {
             base.OnStart();
             model = Intent.Extras.GetString("Model");
-
-            Manager.LiveDataVector.DeployEnabledIndex();
-
-            string[] arrays = new string[Manager.LiveDataVector.EnabledCount];
-
-            for (int i = 0; i < arrays.Length; i++)
-            {
-                int index = Manager.LiveDataVector.EnabledIndex(i);
-                Core.LiveData ld = Manager.LiveDataVector[index];
-                arrays[i] = ld.ShortName + " : " + ld.Content;
-            }
-
-            ListView.Adapter = new ArrayAdapter<string>(
-                this,
-                Android.Resource.Layout.SimpleListItemMultipleChoice,
-                arrays
-            );
-
-            for (int i = 0; i < Manager.LiveDataVector.EnabledCount; i++)
-            {
-                int index = Manager.LiveDataVector.EnabledIndex(i);
-                ListView.SetItemChecked(i, Manager.LiveDataVector[index].Showed);
-            }
         }
 
         protected override void OnStop()
         {
             base.OnStop();
-            //DialogManager.Instance.HideDialog();
         }
-
-        void ValueBtnClick(object sender, EventArgs e)
-        {
-            Manager.LiveDataVector.DeployShowedIndex();
-            Intent intent = new Intent(this, typeof(DataStreamActivity));
-            intent.PutExtra("Model", model);
-            StartActivity(intent);
-        }
-
-        //public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
-        //{
-        //    int code = (int)keyCode;
-        //    int value = (int)Keycode.DpadRight;
-
-        //    if (keyCode == Keycode.DpadRight)
-        //    {
-        //        ResourceManager.Instance.LiveDataVector.DeployShowedIndex();
-        //        Intent intent = new Intent(this, typeof(DataStreamActivity));
-        //        intent.PutExtra("Model", model);
-        //        StartActivity(intent);
-        //        return true;
-        //    }
-        //    return base.OnKeyDown(keyCode, e);
-        //}
     }
 }
