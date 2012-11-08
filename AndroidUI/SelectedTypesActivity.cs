@@ -22,6 +22,7 @@ namespace JM.QingQi.AndroidUI
             base.OnCreate(bundle);
 
             // Create your application here
+            Window.SetFlags(WindowManagerFlags.KeepScreenOn, WindowManagerFlags.KeepScreenOn);
             string[] arrays = new string[7];
             arrays[0] = StaticString.beforeBlank + Database.GetText("QM125T-8H", "QingQi");
             arrays[1] = StaticString.beforeBlank + Database.GetText("QM200GY-F", "QingQi");

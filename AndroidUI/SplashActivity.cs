@@ -20,6 +20,7 @@ namespace JM.QingQi.AndroidUI
             base.OnCreate(bundle);
 
             // Create your application here
+            Window.SetFlags(WindowManagerFlags.KeepScreenOn, WindowManagerFlags.KeepScreenOn);
             StartActivity(typeof(QingQiActivity));
         }
     }

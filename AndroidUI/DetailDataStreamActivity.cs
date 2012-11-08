@@ -22,6 +22,7 @@ namespace JM.QingQi.AndroidUI
             base.OnCreate(bundle);
 
             // Create your application here
+            Window.SetFlags(WindowManagerFlags.KeepScreenOn, WindowManagerFlags.KeepScreenOn);
             string model = Intent.Extras.GetString("Model");
             int position = Intent.Extras.GetInt("Index");
             Core.LiveDataVector vec = Manager.LiveDataVector;

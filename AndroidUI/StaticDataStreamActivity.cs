@@ -31,6 +31,7 @@ namespace JM.QingQi.AndroidUI
             base.OnCreate(bundle);
 
             // Create your application here
+            Window.SetFlags(WindowManagerFlags.KeepScreenOn, WindowManagerFlags.KeepScreenOn);
             protocolFuncs = new Dictionary<string, ProtocolFunc>();
             protocolFuncs[StaticString.beforeBlank + Database.GetText("QM125T-8H", "QingQi")] = OnSynerjectProtocol;
             protocolFuncs[StaticString.beforeBlank + Database.GetText("QM200GY-F", "QingQi")] = OnMikuniProtocol;

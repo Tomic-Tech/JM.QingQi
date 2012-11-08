@@ -20,6 +20,7 @@ namespace JM.QingQi.AndroidUI
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
+            Window.SetFlags(WindowManagerFlags.KeepScreenOn, WindowManagerFlags.KeepScreenOn);
             RequestWindowFeature(WindowFeatures.NoTitle);
             Window.SetFlags(
                 WindowManagerFlags.Fullscreen,

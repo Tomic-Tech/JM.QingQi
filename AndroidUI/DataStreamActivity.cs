@@ -38,6 +38,7 @@ namespace JM.QingQi.AndroidUI
             base.OnCreate(bundle);
 
             // Create your application here
+            Window.SetFlags(WindowManagerFlags.KeepScreenOn, WindowManagerFlags.KeepScreenOn);
             SetContentView(Resource.Layout.DataStream);
             layout = FindViewById<TableLayout>(Resource.Id.tableLayout);
             layout.RemoveAllViews();
@@ -101,6 +102,8 @@ namespace JM.QingQi.AndroidUI
         {
             status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
             Core.LiveDataVector vec = Manager.LiveDataVector;
+            vec.DeployEnabledIndex();
+            vec.DeployShowedIndex();
             for (int i = 0; i < vec.ShowedCount; i++)
             {
                 TextView content = new TextView(this);
@@ -153,8 +156,6 @@ namespace JM.QingQi.AndroidUI
 
         private void OnMikuniProtocol()
         {
-            Manager.LiveDataVector.DeployEnabledIndex();
-            Manager.LiveDataVector.DeployShowedIndex();
             PreparePage();
 
             task = Task.Factory.StartNew(() =>
@@ -251,8 +252,6 @@ namespace JM.QingQi.AndroidUI
                     }
                 }
             }
-            vec.DeployEnabledIndex();
-            vec.DeployShowedIndex();
             PreparePage();
 
             task = Task.Factory.StartNew(() =>
@@ -274,8 +273,6 @@ namespace JM.QingQi.AndroidUI
 
         private void OnVisteonProtocol()
         {
-            Manager.LiveDataVector.DeployEnabledIndex();
-            Manager.LiveDataVector.DeployShowedIndex();
             PreparePage();
 
             task = Task.Factory.StartNew(() =>

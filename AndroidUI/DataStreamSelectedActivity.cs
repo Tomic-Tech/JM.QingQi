@@ -48,6 +48,7 @@ namespace JM.QingQi.AndroidUI
             base.OnCreate(bundle);
 
             // Create your application here
+            Window.SetFlags(WindowManagerFlags.KeepScreenOn, WindowManagerFlags.KeepScreenOn);
             List<string> arrays = new List<string>();
             arrays.Add(StaticString.beforeBlank + Database.GetText("Dynamic Data Stream", "System"));
             arrays.Add(StaticString.beforeBlank + Database.GetText("Static Data Stream", "System"));

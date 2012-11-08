@@ -54,116 +54,121 @@ namespace JM.QingQi.AndroidUI
             base.OnCreate(bundle);
 
             // Create your application here
+            Window.SetFlags(WindowManagerFlags.KeepScreenOn, WindowManagerFlags.KeepScreenOn);
         }
 
         private void OnSynerject()
         {
             string[] arrays = new string[3];
-            arrays[0] = Database.GetText("Injector", "System");
-            arrays[1] = Database.GetText("Ignition Coil", "System");
-            arrays[2] = Database.GetText("Fuel Pump", "System");
+            arrays[0] = StaticString.beforeBlank + Database.GetText("Injector", "System");
+            arrays[1] = StaticString.beforeBlank + Database.GetText("Ignition Coil", "System");
+            arrays[2] = StaticString.beforeBlank + Database.GetText("Fuel Pump", "System");
 
             ListAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, arrays);
             ListView.ItemClick += OnItemClickSynerject;
         }
 
-        private void ShowResult(Task t)
-        {
-            RunOnUiThread(() =>
-            {
-                status.Dismiss();
-                if (t.IsFaulted)
-                {
-                    DialogManager.ShowFatal(this, t.Exception.InnerException.Message, null);
-                }
-                else
-                {
-                    DialogManager.ShowFatal(this, result, null);
-                }
-            });
-        }
+        //private void ShowResult(Task t)
+        //{
+        //    RunOnUiThread(() =>
+        //    {
+        //        status.Dismiss();
+        //        if (t.IsFaulted)
+        //        {
+        //            DialogManager.ShowFatal(this, t.Exception.InnerException.Message, null);
+        //        }
+        //        else
+        //        {
+        //            DialogManager.ShowFatal(this, result, null);
+        //        }
+        //    });
+        //}
 
         private void OnItemClickSynerject(object sender, AdapterView.ItemClickEventArgs e)
         {
-            if (((TextView)e.View).Text == Database.GetText("Injector", "System"))
-            {
-                string[] arrays = new string[]
-                {
-                    Database.GetText("Injector On Test", "QingQi"),
-                    Database.GetText("Injector Off Test", "QingQi"),
-                };
-                DialogManager.ShowList(this, arrays, (sender2, e2) =>
-                {
-                    if (DialogManager.Which == -1)
-                    {
-                        return;
-                    }
+            Intent intent = new Intent(this, typeof(ActiveTest2Activity));
+            intent.PutExtra("Model", model);
+            intent.PutExtra("Sub", ((TextView)e.View).Text);
+            StartActivity(intent);
+            //if (((TextView)e.View).Text == Database.GetText("Injector", "System"))
+            //{
+            //    string[] arrays = new string[]
+            //    {
+            //        Database.GetText("Injector On Test", "QingQi"),
+            //        Database.GetText("Injector Off Test", "QingQi"),
+            //    };
+            //    DialogManager.ShowList(this, arrays, (sender2, e2) =>
+            //    {
+            //        if (DialogManager.Which == -1)
+            //        {
+            //            return;
+            //        }
 
-                    status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
+            //        status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
                     
-                    Task task = Task.Factory.StartNew(() =>
-                    {
-                        Synerject protocol = new Synerject(Diag.BoxFactory.Instance.Commbox);
-                        result = protocol.Active(Database.GetText("Injector", "System"), DialogManager.Which == 0 ? true : false);
-                    });
+            //        Task task = Task.Factory.StartNew(() =>
+            //        {
+            //            Synerject protocol = new Synerject(Diag.BoxFactory.Instance.Commbox);
+            //            result = protocol.Active(Database.GetText("Injector", "System"), DialogManager.Which == 0 ? true : false);
+            //        });
 
-                    task.ContinueWith(ShowResult);
-                }
-                );
-            }
-            else if (((TextView)e.View).Text == Database.GetText("Ignition Coil", "System"))
-            {
-                string[] arrays = new string[]
-                {
-                    Database.GetText("Ignition Coil On Test", "QingQi"),
-                    Database.GetText("Ignition Coil Off Test", "QingQi"),
-                };
-                DialogManager.ShowList(this, arrays, (sender2, e2) =>
-                {
-                    if (DialogManager.Which == -1)
-                    {
-                        return;
-                    }
+            //        task.ContinueWith(ShowResult);
+            //    }
+            //    );
+            //}
+            //else if (((TextView)e.View).Text == Database.GetText("Ignition Coil", "System"))
+            //{
+            //    string[] arrays = new string[]
+            //    {
+            //        Database.GetText("Ignition Coil On Test", "QingQi"),
+            //        Database.GetText("Ignition Coil Off Test", "QingQi"),
+            //    };
+            //    DialogManager.ShowList(this, arrays, (sender2, e2) =>
+            //    {
+            //        if (DialogManager.Which == -1)
+            //        {
+            //            return;
+            //        }
 
-                    status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
+            //        status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
                     
-                    Task task = Task.Factory.StartNew(() =>
-                    {
-                        Synerject protocol = new Synerject(Diag.BoxFactory.Instance.Commbox);
-                        result = protocol.Active(Database.GetText("Ignition Coil", "System"), DialogManager.Which == 0 ? true : false);
-                    }
-                    );
-                    task.ContinueWith(ShowResult);
-                }
-                );
-            }
-            else if (((TextView)e.View).Text == Database.GetText("Fuel Pump", "System"))
-            {   
-                string[] arrays = new string[]
-                {
-                    Database.GetText("Fuel Pump On Test", "QingQi"),
-                    Database.GetText("Fuel Pump Off Test", "QingQi"),
-                };
-                DialogManager.ShowList(this, arrays, (sender2, e2) =>
-                {
-                    if (DialogManager.Which == -1)
-                    {
-                        return;
-                    }
+            //        Task task = Task.Factory.StartNew(() =>
+            //        {
+            //            Synerject protocol = new Synerject(Diag.BoxFactory.Instance.Commbox);
+            //            result = protocol.Active(Database.GetText("Ignition Coil", "System"), DialogManager.Which == 0 ? true : false);
+            //        }
+            //        );
+            //        task.ContinueWith(ShowResult);
+            //    }
+            //    );
+            //}
+            //else if (((TextView)e.View).Text == Database.GetText("Fuel Pump", "System"))
+            //{   
+            //    string[] arrays = new string[]
+            //    {
+            //        Database.GetText("Fuel Pump On Test", "QingQi"),
+            //        Database.GetText("Fuel Pump Off Test", "QingQi"),
+            //    };
+            //    DialogManager.ShowList(this, arrays, (sender2, e2) =>
+            //    {
+            //        if (DialogManager.Which == -1)
+            //        {
+            //            return;
+            //        }
 
-                    status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
+            //        status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
 
-                    Task task = Task.Factory.StartNew(() =>
-                    {
-                        Synerject protocol = new Synerject(Diag.BoxFactory.Instance.Commbox);
-                        result = protocol.Active(Database.GetText("Fuel Pump", "System"), DialogManager.Which == 0 ? true : false);
-                    }
-                    );
+            //        Task task = Task.Factory.StartNew(() =>
+            //        {
+            //            Synerject protocol = new Synerject(Diag.BoxFactory.Instance.Commbox);
+            //            result = protocol.Active(Database.GetText("Fuel Pump", "System"), DialogManager.Which == 0 ? true : false);
+            //        }
+            //        );
 
-                    task.ContinueWith(ShowResult);
-                }
-                );
-            }
+            //        task.ContinueWith(ShowResult);
+            //    }
+            //    );
+            //}
         }
     }
 }

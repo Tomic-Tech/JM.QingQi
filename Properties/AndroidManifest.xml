@@ -1,11 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" 
-		  android:versionCode="1" 
-		  android:versionName="1.0" 
-		  package="JM.QingQi">
-	<uses-sdk />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="JM.QingQi" android:installLocation="internalOnly">
+  <uses-sdk android:targetSdkVersion="8" />
   <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-	<application android:label="@string/ApplicationName">
+  <application android:label="@string/ApplicationName">
     <receiver android:name="jm.qingqi.androidui.BootCompleteReceiver">
       <intent-filter>
         <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -13,4 +10,5 @@
       </intent-filter>
     </receiver>
   </application>
+  <uses-permission android:name="android.permission.WAKE_LOCK" />
 </manifest>

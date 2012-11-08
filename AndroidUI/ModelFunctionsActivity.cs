@@ -43,6 +43,7 @@ namespace JM.QingQi.AndroidUI
         {
             base.OnCreate(bundle);
             // Create your application here
+            Window.SetFlags(WindowManagerFlags.KeepScreenOn, WindowManagerFlags.KeepScreenOn);
         }
 
         protected override void OnStart()
@@ -532,6 +533,7 @@ namespace JM.QingQi.AndroidUI
                     {
                         funcs[((TextView)e.View).Text]();
                     }
+                    //funcs[((TextView)e.View).Text]();
                 });
             });
         }

@@ -19,6 +19,7 @@ namespace JM.QingQi.AndroidUI
         {
             base.OnCreate(bundle);
             // Create your application here
+            Window.SetFlags(WindowManagerFlags.KeepScreenOn, WindowManagerFlags.KeepScreenOn);
             SetContentView(Resource.Layout.DeviceInfo);
 
             ListView list = (ListView)FindViewById(Resource.Id.deviceInfoListView);
