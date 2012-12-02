@@ -24,19 +24,19 @@ namespace JM.QingQi.AndroidUI
 
         private Dictionary<string, ProtocolFunc> protocolFuncs;
         private string model;
-        private ProgressDialog status;
-        private string result = "";
+        //private ProgressDialog status;
+        //private string result = "";
 
         public ActiveTestActivity()
         {
             protocolFuncs = new Dictionary<string, ProtocolFunc>();
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM125T-8H", "QingQi")] = OnSynerject;
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM200GY-F", "QingQi")] = null;
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM250GY", "QingQi")] = OnSynerject;
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM250T", "QingQi")] = OnSynerject;
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM200-3D", "QingQi")] = null;
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM200J-3L", "QingQi")] = null;
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM250J-2L", "QingQi")] = null;
+            protocolFuncs[Database.GetText("QM125T-8H", "QingQi")] = OnSynerject;
+            protocolFuncs[Database.GetText("QM200GY-F", "QingQi")] = null;
+            protocolFuncs[Database.GetText("QM250GY", "QingQi")] = OnSynerject;
+            protocolFuncs[Database.GetText("QM250T", "QingQi")] = OnSynerject;
+            protocolFuncs[Database.GetText("QM200-3D", "QingQi")] = null;
+            protocolFuncs[Database.GetText("QM200J-3L", "QingQi")] = null;
+            protocolFuncs[Database.GetText("QM250J-2L", "QingQi")] = null;
         }
 
         protected override void OnStart()
@@ -87,8 +87,9 @@ namespace JM.QingQi.AndroidUI
         private void OnItemClickSynerject(object sender, AdapterView.ItemClickEventArgs e)
         {
             Intent intent = new Intent(this, typeof(ActiveTest2Activity));
+            string sub = ((TextView)e.View).Text;
             intent.PutExtra("Model", model);
-            intent.PutExtra("Sub", ((TextView)e.View).Text);
+            intent.PutExtra("Sub", sub.TrimStart(' '));
             StartActivity(intent);
             //if (((TextView)e.View).Text == Database.GetText("Injector", "System"))
             //{

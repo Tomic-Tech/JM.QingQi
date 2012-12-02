@@ -21,7 +21,8 @@
         android:minHeight="25px"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/linearLayout1">
+        android:id="@+id/linearLayout1"
+        android:gravity="center_horizontal">
         <Button
             android:text="Button"
             android:layout_width="wrap_content"

@@ -11,6 +11,7 @@ using Android.Views;
 using Android.Widget;
 
 using JM.QingQi.Vehicle;
+using JM.Core;
 
 namespace JM.QingQi.AndroidUI
 {
@@ -31,8 +32,33 @@ namespace JM.QingQi.AndroidUI
             string[] arrays = new string[4];
             arrays[0] = StaticString.beforeBlank + vec[index].Content;
             arrays[1] = StaticString.beforeBlank + vec[index].Value + vec[index].Unit;
-            arrays[2] = StaticString.beforeBlank + vec[index].DefaultValue;
-            arrays[3] = StaticString.beforeBlank + model + position;
+            arrays[2] = StaticString.beforeBlank + Database.GetText("Range", "System") + " : " + vec[index].DefaultValue;
+            StringBuilder description = new StringBuilder();
+#if TOMIC_ANDROID
+            if (vec[index].Description.Length > 23)
+            {
+                for (int i = 0; i < vec[index].Description.Length; )
+                {
+                    if (i + 23 > vec[index].Description.Length)
+                    {
+                        description.Append(StaticString.beforeBlank + vec[index].Description.Substring(i) + "\n");
+                    }
+                    else
+                    {
+                        description.Append(StaticString.beforeBlank + vec[index].Description.Substring(i, 23) + "\n");
+                    }
+                    i += 23;
+                }
+            }
+            else
+            {
+                description.Append(StaticString.beforeBlank + vec[index].Description);
+            }
+#else
+            description.Append(StaticString.beforeBlank + vec[index].Description);
+#endif
+            //arrays[3] = StaticString.beforeBlank + vec[index].Description;
+            arrays[3] = description.ToString();
 
             ListAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, arrays);
         }

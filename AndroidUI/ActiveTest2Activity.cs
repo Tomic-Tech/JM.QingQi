@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 
 using Android.App;
 using Android.Content;
@@ -42,21 +43,26 @@ namespace JM.QingQi.AndroidUI
             synerjectFuncs = new Dictionary<string, ProtocolFunc>();
             synerjectFuncs[Database.GetText("Injector", "System")] = () =>
             {
-                foreach (var v in Manager.LiveDataVector)
-                {
-                    if (v.ShortName == "INJ_MODE")
-                    {
-                        v.Enabled = true;
-                        v.Showed = true;
-                    }
-                }
-
                 positionBtn.Text = Database.GetText("Injector On Test", "QingQi");
                 negativeBtn.Text = Database.GetText("Injector Off Test", "QingQi");
-                PreparePage();
 
                 task = Task.Factory.StartNew(() => 
                 {
+                    foreach (var v in Manager.LiveDataVector)
+                    {
+                        if (v.ShortName == "INJ_MODE")
+                        {
+                            v.Enabled = true;
+                            v.Showed = true;
+                        }
+                    }
+
+                    PreparePage();
+
+                    if (!Manager.Commbox.Close() || !Manager.Commbox.Open())
+                    {
+                        throw new IOException(Database.GetText("Open Commbox Fail", "System"));
+                    }
                     protocol = new Synerject(Diag.BoxFactory.Instance.Commbox);
                     ((Synerject)protocol).Active(Manager.LiveDataVector, Database.GetText("Injector", "System"));
                 }).ContinueWith(ShowResult);
@@ -64,21 +70,27 @@ namespace JM.QingQi.AndroidUI
 
             synerjectFuncs[Database.GetText("Ignition Coil", "System")] = () =>
             {
-                foreach (var v in Manager.LiveDataVector)
-                {
-                    if (v.ShortName == "MOD_IGA")
-                    {
-                        v.Enabled = true;
-                        v.Showed = true;
-                    }
-                }
-
                 positionBtn.Text = Database.GetText("Ignition Coil On Test", "QingQi");
                 negativeBtn.Text = Database.GetText("Ignition Coil Off Test", "QingQi");
-                PreparePage();
 
                 task = Task.Factory.StartNew(() =>
                 {
+                    foreach (var v in Manager.LiveDataVector)
+                    {
+                        if ((v.ShortName == "CUR_IGC_DIAG_cyl1") ||
+                            (v.ShortName == "IGA_1") ||
+                            (v.ShortName == "TD_1"))
+                        {
+                            v.Enabled = true;
+                            v.Showed = true;
+                        }
+                    }
+                    PreparePage();
+
+                    if (!Manager.Commbox.Close() || !Manager.Commbox.Open())
+                    {
+                        throw new IOException(Database.GetText("Open Commbox Fail", "System"));
+                    }
                     protocol = new Synerject(Diag.BoxFactory.Instance.Commbox);
                     ((Synerject)protocol).Active(Manager.LiveDataVector, Database.GetText("Ignition Coil", "System"));
                 }).ContinueWith(ShowResult);
@@ -86,21 +98,24 @@ namespace JM.QingQi.AndroidUI
 
             synerjectFuncs[Database.GetText("Fuel Pump", "System")] = () =>
             {
-                foreach (var v in Manager.LiveDataVector)
-                {
-                    if (v.ShortName == "STATE_EFP")
-                    {
-                        v.Enabled = true;
-                        v.Showed = true;
-                    }
-                }
-
                 positionBtn.Text = Database.GetText("Fuel Pump On Test", "QingQi");
                 negativeBtn.Text = Database.GetText("Fuel Pump Off Test", "QingQi");
-                PreparePage();
 
                 task = Task.Factory.StartNew(() =>
                 {
+                    foreach (var v in Manager.LiveDataVector)
+                    {
+                        if (v.ShortName == "STATE_EFP")
+                        {
+                            v.Enabled = true;
+                            v.Showed = true;
+                        }
+                    }
+                    PreparePage();
+                    if (!Manager.Commbox.Close() || !Manager.Commbox.Open())
+                    {
+                        throw new IOException(Database.GetText("Open Commbox Fail", "System"));
+                    }
                     protocol = new Synerject(Diag.BoxFactory.Instance.Commbox);
                     ((Synerject)protocol).Active(Manager.LiveDataVector, Database.GetText("Fuel Pump", "System"));
                 }).ContinueWith(ShowResult);
@@ -136,8 +151,8 @@ namespace JM.QingQi.AndroidUI
             base.OnStart();
 
             layout.RemoveAllViews();
-            model = Intent.Extras.GetString("Model").Trim();
-            sub = Intent.Extras.GetString("Sub").Trim();
+            model = Intent.Extras.GetString("Model");
+            sub = Intent.Extras.GetString("Sub");
             protocolFuncs[model]();
         }
 
@@ -157,7 +172,7 @@ namespace JM.QingQi.AndroidUI
             RunOnUiThread(() => 
             {
                 Core.LiveDataVector vec = Manager.LiveDataVector;
-                int position = vec.ShowedPosition(ld.Index);
+                int position = vec.ShowedPosition(ld.Position);
 
                 TableRow row = (TableRow)layout.GetChildAt(position);
 
@@ -171,29 +186,32 @@ namespace JM.QingQi.AndroidUI
             Manager.LiveDataVector.DeployEnabledIndex();
             Manager.LiveDataVector.DeployShowedIndex();
             Core.LiveDataVector vec = Manager.LiveDataVector;
-            for (int i = 0; i < vec.ShowedCount; ++i)
+            RunOnUiThread(() => 
             {
-                TextView content = new TextView(this);
-                content.Text = StaticString.beforeBlank + vec[vec.ShowedIndex(i)].Content;
-                TextView unit = new TextView(this);
-                unit.Text = vec[vec.ShowedIndex(i)].Unit;
-                TextView value = new TextView(this);
-                value.Text = vec[vec.ShowedIndex(i)].Value;
-                TableRow row = new TableRow(this);
-                row.AddView(content);
-                row.AddView(value);
-                row.AddView(unit);
-                layout.AddView(row);
-
-                vec[vec.ShowedIndex(i)].PropertyChanged += (sender, e) =>
+                for (int i = 0; i < vec.ShowedCount; ++i)
                 {
-                    if (e.PropertyName == "Value")
+                    TextView content = new TextView(this);
+                    content.Text = StaticString.beforeBlank + vec[vec.ShowedIndex(i)].Content;
+                    TextView unit = new TextView(this);
+                    unit.Text = vec[vec.ShowedIndex(i)].Unit;
+                    TextView value = new TextView(this);
+                    value.Text = vec[vec.ShowedIndex(i)].Value;
+                    TableRow row = new TableRow(this);
+                    row.AddView(content);
+                    row.AddView(value);
+                    row.AddView(unit);
+                    layout.AddView(row);
+
+                    vec[vec.ShowedIndex(i)].PropertyChanged += (sender, e) =>
                     {
-                        OnValueChange((Core.LiveData)sender);
-                    }
-                };
-            }
-            status.Dismiss();
+                        if (e.PropertyName == "Value")
+                        {
+                            OnValueChange((Core.LiveData)sender);
+                        }
+                    };
+                }
+                status.Dismiss();
+            });
         }
 
         private void OnSynerject()

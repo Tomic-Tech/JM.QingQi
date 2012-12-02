@@ -55,14 +55,14 @@ namespace JM.QingQi.AndroidUI
 
             funcs = new Dictionary<string, Func>();
             
-            funcs.Add(StaticString.beforeBlank + Database.GetText("Dynamic Data Stream", "System"), () => 
+            funcs.Add(Database.GetText("Dynamic Data Stream", "System"), () => 
             {
                 //PrepareLiveDataVector();
                 Intent intent = new Intent(this, typeof(DataStreamActivity));
                 intent.PutExtra("Model", model);
                 StartActivity(intent);
             });
-            funcs.Add(StaticString.beforeBlank + Database.GetText("Static Data Stream", "System"), () => 
+            funcs.Add(Database.GetText("Static Data Stream", "System"), () => 
             {
                 //PrepareLiveDataVector();
                 Intent intent = new Intent(this, typeof(StaticDataStreamActivity));
@@ -74,7 +74,8 @@ namespace JM.QingQi.AndroidUI
 
             ListView.ItemClick += (sender, e) => 
             {
-                funcs[((TextView)e.View).Text]();
+                string test = ((TextView)e.View).Text;
+                funcs[test.TrimStart(' ')]();
             };
         }
 

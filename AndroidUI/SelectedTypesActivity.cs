@@ -43,7 +43,9 @@ namespace JM.QingQi.AndroidUI
                     this,
                     typeof(ModelFunctionsActivity)
                 );
-                intent.PutExtra("MenuClick", ((TextView)args.View).Text);
+                string model = ((TextView)args.View).Text;
+
+                intent.PutExtra("MenuClick", model.TrimStart(' '));
                 StartActivity(intent);
             };
         }

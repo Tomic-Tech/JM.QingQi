@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 using Android.App;
 using Android.Content;
@@ -33,13 +34,13 @@ namespace JM.QingQi.AndroidUI
             // Create your application here
             Window.SetFlags(WindowManagerFlags.KeepScreenOn, WindowManagerFlags.KeepScreenOn);
             protocolFuncs = new Dictionary<string, ProtocolFunc>();
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM125T-8H", "QingQi")] = OnSynerjectProtocol;
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM200GY-F", "QingQi")] = OnMikuniProtocol;
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM250GY", "QingQi")] = OnSynerjectProtocol;
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM250T", "QingQi")] = OnSynerjectProtocol;
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM200-3D", "QingQi")] = OnMikuniProtocol;
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM200J-3L", "QingQi")] = OnMikuniProtocol;
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM250J-2L", "QingQi")] = OnVisteonProtocol;
+            protocolFuncs[Database.GetText("QM125T-8H", "QingQi")] = OnSynerjectProtocol;
+            protocolFuncs[Database.GetText("QM200GY-F", "QingQi")] = OnMikuniProtocol;
+            protocolFuncs[Database.GetText("QM250GY", "QingQi")] = OnSynerjectProtocol;
+            protocolFuncs[Database.GetText("QM250T", "QingQi")] = OnSynerjectProtocol;
+            protocolFuncs[Database.GetText("QM200-3D", "QingQi")] = OnMikuniProtocol;
+            protocolFuncs[Database.GetText("QM200J-3L", "QingQi")] = OnMikuniProtocol;
+            protocolFuncs[Database.GetText("QM250J-2L", "QingQi")] = OnVisteonProtocol;
 
             model = Intent.Extras.GetString("Model");
             protocolFuncs[model]();
@@ -53,9 +54,23 @@ namespace JM.QingQi.AndroidUI
         private void OnMikuniProtocol()
         {
             status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
+            Manager.LiveDataVector = Database.GetLiveData("Mikuni");
+            for (int i = 0; i < Manager.LiveDataVector.Count; i++)
+            {
+                if ((Manager.LiveDataVector[i].ShortName == "TS")
+                    || (Manager.LiveDataVector[i].ShortName == "ERF")
+                    || (Manager.LiveDataVector[i].ShortName == "IS"))
+                {
+                    Manager.LiveDataVector[i].Enabled = false;
+                }
+            }
             Core.LiveDataVector vec = Manager.LiveDataVector;
             task = Task.Factory.StartNew(() =>
             {
+                if (!Manager.Commbox.Close() || !Manager.Commbox.Open())
+                {
+                    throw new IOException(Database.GetText("Open Commbox Fail", "System"));
+                }
                 Diag.MikuniOptions options = new Diag.MikuniOptions();
                 options.Parity = Diag.MikuniParity.Even;
                 Mikuni protocol = new Mikuni(Manager.Commbox, options);
@@ -71,81 +86,37 @@ namespace JM.QingQi.AndroidUI
         private void OnSynerjectProtocol()
         {
             status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
+            //Manager.LiveDataVector = Database.GetLiveData("Synerject");
+            Manager.LiveDataVector = Database.GetLiveData(model);
             Core.LiveDataVector vec = Manager.LiveDataVector;
 
             for (int i = 0; i < vec.Count; i++)
             {
-                if (model == StaticString.beforeBlank + Database.GetText("QM125T-8H", "QingQi"))
+                if ((vec[i].ShortName == "N") ||
+                    (vec[i].ShortName == "VBK_MMV") ||
+                    (vec[i].ShortName == "STATE_EFP") ||
+                    (vec[i].ShortName == "TI_LAM_COR") ||
+                    (vec[i].ShortName == "IGA_1") ||
+                    (vec[i].ShortName == "VLS_UP_1") ||
+                    (vec[i].ShortName == "AMP") ||
+                    (vec[i].ShortName == "TCO") ||
+                    (vec[i].ShortName == "TPS_MTC_1"))
                 {
-                    if ((vec[i].ShortName == "CRASH") ||
-                        (vec[i].ShortName == "DIST_ACT_MIL") ||
-                        (vec[i].ShortName == "ISA_AD_T_DLY") ||
-                        (vec[i].ShortName == "ISA_ANG_DUR_MEC") ||
-                        (vec[i].ShortName == "ISA_CTL_IS") ||
-                        (vec[i].ShortName == "ISC_ISA_AD_MV") ||
-                        (vec[i].ShortName == "LV_EOL_EFP_PRIM") ||
-                        (vec[i].ShortName == "LV_EOL_EFP_PRIM_ACT") ||
-                        (vec[i].ShortName == "LV_IMMO_PROG") ||
-                        (vec[i].ShortName == "LV_IMMO_ECU_PROG") ||
-                        (vec[i].ShortName == "LV_LOCK_IMOB") ||
-                        (vec[i].ShortName == "LV_VIP") ||
-                        (vec[i].ShortName == "LV_EOP") ||
-                        (vec[i].ShortName == "TCOPWM") ||
-                        (vec[i].ShortName == "VS_8") ||
-                        (vec[i].ShortName == "V_TPS_1_BAS") ||
-                        (vec[i].ShortName == "LV_SAV"))
-                    {
-                        vec[i].Enabled = false;
-                    }
+                    vec[i].Enabled = true;
+                    vec[i].Showed = true;
                 }
-                else if (model == StaticString.beforeBlank + Database.GetText("QM250GY", "QingQi"))
+                else
                 {
-                    if ((vec[i].ShortName == "CRASH") ||
-                        (vec[i].ShortName == "DIST_ACT_MIL") ||
-                        (vec[i].ShortName == "ISA_AD_T_DLY") ||
-                        (vec[i].ShortName == "ISA_ANG_DUR_MEC") ||
-                        (vec[i].ShortName == "ISA_CTL_IS") ||
-                        (vec[i].ShortName == "ISC_ISA_AD_MV") ||
-                        (vec[i].ShortName == "LV_EOL_EFP_PRIM") ||
-                        (vec[i].ShortName == "LV_EOL_EFP_PRIM_ACT") ||
-                        (vec[i].ShortName == "LV_IMMO_PROG") ||
-                        (vec[i].ShortName == "LV_IMMO_ECU_PROG") ||
-                        (vec[i].ShortName == "LV_LOCK_IMOB") ||
-                        (vec[i].ShortName == "LV_VIP") ||
-                        (vec[i].ShortName == "LV_EOP") ||
-                        (vec[i].ShortName == "TCOPWM") ||
-                        (vec[i].ShortName == "VS_8") ||
-                        (vec[i].ShortName == "LV_SAV"))
-                    {
-                        vec[i].Enabled = false;
-                    }
-                }
-                else if (model == StaticString.beforeBlank + Database.GetText("QM250T", "QingQi"))
-                {
-                    if ((vec[i].ShortName == "CRASH") ||
-                        (vec[i].ShortName == "DIST_ACT_MIL") ||
-                        (vec[i].ShortName == "ISA_AD_T_DLY") ||
-                        (vec[i].ShortName == "ISA_ANG_DUR_MEC") ||
-                        (vec[i].ShortName == "ISA_CTL_IS") ||
-                        (vec[i].ShortName == "ISC_ISA_AD_MV") ||
-                        (vec[i].ShortName == "LV_EOL_EFP_PRIM") ||
-                        (vec[i].ShortName == "LV_EOL_EFP_PRIM_ACT") ||
-                        (vec[i].ShortName == "LV_IMMO_PROG") ||
-                        (vec[i].ShortName == "LV_IMMO_ECU_PROG") ||
-                        (vec[i].ShortName == "LV_LOCK_IMOB") ||
-                        (vec[i].ShortName == "LV_VIP") ||
-                        (vec[i].ShortName == "LV_EOP") ||
-                        (vec[i].ShortName == "VS_8") ||
-                        (vec[i].ShortName == "V_TPS_1_BAS") ||
-                        (vec[i].ShortName == "LV_SAV"))
-                    {
-                        vec[i].Enabled = false;
-                    }
+                    vec[i].Enabled = false;
                 }
             }
             vec.DeployEnabledIndex();
             task = Task.Factory.StartNew(() =>
             {
+                if (!Manager.Commbox.Close() || !Manager.Commbox.Open())
+                {
+                    throw new IOException(Database.GetText("Open Commbox Fail", "System"));
+                }
                 Synerject protocol = new Synerject(Manager.Commbox);
                 protocol.StaticDataStream(vec);
             });
@@ -159,9 +130,14 @@ namespace JM.QingQi.AndroidUI
         private void OnVisteonProtocol()
         {
             status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
+            Manager.LiveDataVector = Database.GetLiveData("Visteon");
             Core.LiveDataVector vec = Manager.LiveDataVector;
             task = Task.Factory.StartNew(() =>
             {
+                if (!Manager.Commbox.Close() || !Manager.Commbox.Open())
+                {
+                    throw new IOException(Database.GetText("Open Commbox Fail", "System"));
+                }
                 Visteon protocol = new Visteon(Manager.Commbox);
                 protocol.StaticDataStream(vec);
             });

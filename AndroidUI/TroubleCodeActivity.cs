@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 
 using Android.App;
 using Android.Content;
@@ -28,6 +29,7 @@ namespace JM.QingQi.AndroidUI
         private string model;
         private List<Core.TroubleCode> codes = null;
         private ProgressDialog status = null;
+        private int currentIndex = 0;
 
         private enum UIStatus
         {
@@ -40,13 +42,13 @@ namespace JM.QingQi.AndroidUI
         public TroubleCodeActivity()
         {
             protocolFuncs = new Dictionary<string, ProtocolFunc>();
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM125T-8H", "QingQi")] = OnSynerjectProtocol;
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM200GY-F", "QingQi")] = OnMikuniProtocol;
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM250GY", "QingQi")] = OnSynerjectProtocol;
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM250T", "QingQi")] = OnSynerjectProtocol;
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM200-3D", "QingQi")] = OnMikuniProtocol;
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM200J-3L", "QingQi")] = OnMikuniProtocol;
-            protocolFuncs[StaticString.beforeBlank + Database.GetText("QM250J-2L", "QingQi")] = OnVisteonProtocol;
+            protocolFuncs[Database.GetText("QM125T-8H", "QingQi")] = OnSynerjectProtocol;
+            protocolFuncs[Database.GetText("QM200GY-F", "QingQi")] = OnMikuniProtocol;
+            protocolFuncs[Database.GetText("QM250GY", "QingQi")] = OnSynerjectProtocol;
+            protocolFuncs[Database.GetText("QM250T", "QingQi")] = OnSynerjectProtocol;
+            protocolFuncs[Database.GetText("QM200-3D", "QingQi")] = OnMikuniProtocol;
+            protocolFuncs[Database.GetText("QM200J-3L", "QingQi")] = OnMikuniProtocol;
+            protocolFuncs[Database.GetText("QM250J-2L", "QingQi")] = OnVisteonProtocol;
         }
 
         protected override void OnCreate(Bundle bundle)
@@ -84,7 +86,8 @@ namespace JM.QingQi.AndroidUI
                 }
                 else if (uiStatus == UIStatus.Result)
                 {
-                    if (model == StaticString.beforeBlank + Database.GetText("QM250J-2L", "QingQi"))
+                    uiStatus = UIStatus.CurrentHistory;
+                    if (model == Database.GetText("QM250J-2L", "QingQi"))
                     {
                         this.Finish();
                         return true;
@@ -95,9 +98,9 @@ namespace JM.QingQi.AndroidUI
                         ListView.ItemClick -= OnItemClickMikuni;
                         ListView.ItemClick -= OnItemClickSynerject;
                         ListView.ItemClick -= OnItemClickVisteon;
-                        if ((model == StaticString.beforeBlank + Database.GetText("QM125T-8H", "QingQi")) ||
-                            (model == StaticString.beforeBlank + Database.GetText("QM250GY", "QingQi")) ||
-                            (model == StaticString.beforeBlank + Database.GetText("QM250T", "QingQi")))
+                        if ((model == Database.GetText("QM125T-8H", "QingQi")) ||
+                            (model == Database.GetText("QM250GY", "QingQi")) ||
+                            (model == Database.GetText("QM250T", "QingQi")))
                         {
                             OnSynerjectProtocol();
                         }
@@ -118,12 +121,17 @@ namespace JM.QingQi.AndroidUI
             arrays[0] = StaticString.beforeBlank + Database.GetText("Read Current Trouble Code", "System");
             arrays[1] = StaticString.beforeBlank + Database.GetText("Read History Trouble Code", "System");
             ListView.Adapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, arrays);
+            ListView.SetSelection(currentIndex);
             funcs = new Dictionary<string, ProtocolFunc>();
-            funcs[arrays[0]] = () =>
+            funcs[arrays[0].TrimStart(' ')] = () =>
             {
                 status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
                 Task task = Task.Factory.StartNew(() =>
                 {
+                    if (!Manager.Commbox.Close() || !Manager.Commbox.Open())
+                    {
+                        throw new IOException(Database.GetText("Open Commbox Fail", "System"));
+                    }
                     Diag.MikuniOptions options = new Diag.MikuniOptions();
                     options.Parity = Diag.MikuniParity.Even;
                     Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox, options);
@@ -133,12 +141,16 @@ namespace JM.QingQi.AndroidUI
 				task.ContinueWith((t) => {ShowResult(t, null);});
             };
 
-            funcs[arrays[1]] = () =>
+            funcs[arrays[1].TrimStart(' ')] = () =>
             {
                 status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
 
                 Task task = Task.Factory.StartNew(() =>
                 {
+                    if (!Manager.Commbox.Close() || !Manager.Commbox.Open())
+                    {
+                        throw new IOException(Database.GetText("Open Commbox Fail", "System"));
+                    }
                     Diag.MikuniOptions options = new Diag.MikuniOptions();
                     options.Parity = Diag.MikuniParity.Even;
                     Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox, options);
@@ -153,7 +165,9 @@ namespace JM.QingQi.AndroidUI
 
         private void OnItemClickMikuni(object sender, AdapterView.ItemClickEventArgs e)
         {
-            funcs[((TextView)e.View).Text]();
+            currentIndex = e.Position;
+            string text = ((TextView)e.View).Text;
+            funcs[text.TrimStart(' ')]();
         }
 
 
@@ -171,12 +185,17 @@ namespace JM.QingQi.AndroidUI
             arrays[0] = StaticString.beforeBlank + Database.GetText("Read Current Trouble Code", "System");
             arrays[1] = StaticString.beforeBlank + Database.GetText("Read History Trouble Code", "System");
             ListView.Adapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, arrays);
+            ListView.SetSelection(currentIndex);
             funcs = new Dictionary<string, ProtocolFunc>();
-            funcs[arrays[0]] = () =>
+            funcs[arrays[0].TrimStart(' ')] = () =>
             {
                 status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
                 Task task = Task.Factory.StartNew(() =>
                 {
+                    if (!Manager.Commbox.Close() || !Manager.Commbox.Open())
+                    {
+                        throw new IOException(Database.GetText("Open Commbox Fail", "System"));
+                    }
                     Synerject protocol = new Synerject(Diag.BoxFactory.Instance.Commbox);
                     codes = protocol.ReadTroubleCode(false);
                 });
@@ -184,12 +203,16 @@ namespace JM.QingQi.AndroidUI
 				task.ContinueWith((t) => {ShowResult(t, null);});
             };
 
-            funcs[arrays[1]] = () =>
+            funcs[arrays[1].TrimStart(' ')] = () =>
             {
                 status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
 
                 Task task = Task.Factory.StartNew(() =>
                 {
+                    if (!Manager.Commbox.Close() || !Manager.Commbox.Open())
+                    {
+                        throw new IOException(Database.GetText("Open Commbox Fail", "System"));
+                    }
                     Synerject protocol = new Synerject(Diag.BoxFactory.Instance.Commbox);
                     codes = protocol.ReadTroubleCode(true);
                 });
@@ -207,7 +230,9 @@ namespace JM.QingQi.AndroidUI
             //text.Append(" ");
             //text.Append(((TextView)e.View).Text);
             //Toast.MakeText(this, Database.GetText(text.ToString()), ToastLength.Long).Show();
-            funcs[((TextView)e.View).Text]();
+            currentIndex = e.Position;
+            string text = ((TextView)e.View).Text;
+            funcs[text.TrimStart(' ')]();
         }
 
         private void OnVisteonProtocol()
@@ -215,6 +240,10 @@ namespace JM.QingQi.AndroidUI
             status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
             Task task = Task.Factory.StartNew(() =>
             {
+                if (!Manager.Commbox.Close() || !Manager.Commbox.Open())
+                {
+                    throw new IOException(Database.GetText("Open Commbox Fail", "System"));
+                }
                 Visteon protocol = new Visteon(Manager.Commbox);
                 codes = protocol.ReadTroubleCode();
             });
@@ -245,6 +274,7 @@ namespace JM.QingQi.AndroidUI
             if (codes == null || codes.Count == 0)
                 return;
 
+            uiStatus = UIStatus.Result;
             string[] arrays = new string[codes.Count];
             int i = 0;
             foreach (var item in codes)
