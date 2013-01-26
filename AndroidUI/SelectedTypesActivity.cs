@@ -25,12 +25,12 @@ namespace JM.QingQi.AndroidUI
             Window.SetFlags(WindowManagerFlags.KeepScreenOn, WindowManagerFlags.KeepScreenOn);
             string[] arrays = new string[7];
             arrays[0] = StaticString.beforeBlank + Database.GetText("QM125T-8H", "QingQi");
-            arrays[1] = StaticString.beforeBlank + Database.GetText("QM200GY-F", "QingQi");
-            arrays[2] = StaticString.beforeBlank + Database.GetText("QM250GY", "QingQi");
-            arrays[3] = StaticString.beforeBlank + Database.GetText("QM250T", "QingQi");
-            arrays[4] = StaticString.beforeBlank + Database.GetText("QM200-3D", "QingQi");
-            arrays[5] = StaticString.beforeBlank + Database.GetText("QM200J-3L", "QingQi");
-            arrays[6] = StaticString.beforeBlank + Database.GetText("QM250J-2L", "QingQi");
+            arrays[1] = StaticString.beforeBlank + Database.GetText("QM200J-3L", "QingQi");
+            arrays[2] = StaticString.beforeBlank + Database.GetText("QM200GY-F", "QingQi");
+            arrays[3] = StaticString.beforeBlank + Database.GetText("QM200-3D", "QingQi");
+            arrays[4] = StaticString.beforeBlank + Database.GetText("QM250J-2L", "QingQi");
+            arrays[5] = StaticString.beforeBlank + Database.GetText("QM250GY", "QingQi");
+            arrays[6] = StaticString.beforeBlank + Database.GetText("QM250T", "QingQi");
             ListAdapter = new ArrayAdapter<string>(
                 this,
                 Android.Resource.Layout.SimpleListItem1,

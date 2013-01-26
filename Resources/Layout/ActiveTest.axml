@@ -3,35 +3,38 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-    <ScrollView
-        android:id="@+id/scrollView01"
-        android:layout_height="wrap_content"
-        android:layout_width="fill_parent">
-        <TableLayout
-            android:minWidth="25px"
-            android:minHeight="25px"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:id="@+id/activeTestLayout"
-            android:padding="5dp" />
-    </ScrollView>
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:minWidth="25px"
         android:minHeight="25px"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/linearLayout1"
         android:gravity="center_horizontal">
+        <TextView
+            android:text="Large Text"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:id="@+id/noticeText" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:minWidth="25px"
+            android:minHeight="25px"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:id="@+id/linearLayout2">
+            <Button
+                android:text="Button"
+                android:id="@+id/buttonPositive"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
         <Button
             android:text="Button"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
-            android:id="@+id/buttonPositive" />
-        <Button
-            android:text="Button"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:id="@+id/buttonNegative" />
+            android:id="@+id/buttonNegative"
+            android:visibility="gone" />
     </LinearLayout>
 </LinearLayout>

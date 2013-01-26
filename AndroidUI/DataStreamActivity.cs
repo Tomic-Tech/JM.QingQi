@@ -172,7 +172,7 @@ namespace JM.QingQi.AndroidUI
 
             task = Task.Factory.StartNew(() =>
             {
-                Manager.LiveDataVector = Database.GetLiveData("Mikuni");
+                Manager.LiveDataVector = Database.GetLiveData("QingQi");
                 for (int i = 0; i < Manager.LiveDataVector.Count; i++)
                 {
                     if ((Manager.LiveDataVector[i].ShortName == "TS")

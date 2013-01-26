@@ -135,7 +135,7 @@ namespace JM.QingQi.AndroidUI
                     Diag.MikuniOptions options = new Diag.MikuniOptions();
                     options.Parity = Diag.MikuniParity.Even;
                     Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox, options);
-                    codes = protocol.ReadCurrentTroubleCode();
+                    codes = protocol.ReadCurrentTroubleCode("QingQi");
                 });
 
 				task.ContinueWith((t) => {ShowResult(t, null);});
@@ -154,7 +154,7 @@ namespace JM.QingQi.AndroidUI
                     Diag.MikuniOptions options = new Diag.MikuniOptions();
                     options.Parity = Diag.MikuniParity.Even;
                     Mikuni protocol = new Mikuni(Diag.BoxFactory.Instance.Commbox, options);
-                    codes = protocol.ReadHistoryTroubleCode();
+                    codes = protocol.ReadHistoryTroubleCode("QingQi");
                 });
 
 				task.ContinueWith((t) => {ShowResult(t, null);});

@@ -54,7 +54,7 @@ namespace JM.QingQi.AndroidUI
         private void OnMikuniProtocol()
         {
             status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
-            Manager.LiveDataVector = Database.GetLiveData("Mikuni");
+            Manager.LiveDataVector = Database.GetLiveData("QingQi");
             for (int i = 0; i < Manager.LiveDataVector.Count; i++)
             {
                 if ((Manager.LiveDataVector[i].ShortName == "TS")
@@ -65,6 +65,8 @@ namespace JM.QingQi.AndroidUI
                 }
             }
             Core.LiveDataVector vec = Manager.LiveDataVector;
+            vec.DeployEnabledIndex();
+            vec.DeployShowedIndex();
             task = Task.Factory.StartNew(() =>
             {
                 if (!Manager.Commbox.Close() || !Manager.Commbox.Open())
@@ -111,6 +113,7 @@ namespace JM.QingQi.AndroidUI
                 }
             }
             vec.DeployEnabledIndex();
+            vec.DeployShowedIndex();
             task = Task.Factory.StartNew(() =>
             {
                 if (!Manager.Commbox.Close() || !Manager.Commbox.Open())

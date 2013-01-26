@@ -29,7 +29,7 @@ namespace JM.QingQi.AndroidUI
         private Dictionary<string, ProtocolFunc> protocolFuncs;
         private Dictionary<string, ProtocolFunc> synerjectFuncs;
         private ProgressDialog status;
-        private TableLayout layout;
+        private TextView noticeText;
         private Button positionBtn;
         private Button negativeBtn;
         private JM.Diag.AbstractECU protocol;
@@ -45,6 +45,7 @@ namespace JM.QingQi.AndroidUI
             {
                 positionBtn.Text = Database.GetText("Injector On Test", "QingQi");
                 negativeBtn.Text = Database.GetText("Injector Off Test", "QingQi");
+                noticeText.Text = Database.GetText("Injector Notice", "QingQi");
 
                 task = Task.Factory.StartNew(() => 
                 {
@@ -57,13 +58,12 @@ namespace JM.QingQi.AndroidUI
                         }
                     }
 
-                    PreparePage();
-
                     if (!Manager.Commbox.Close() || !Manager.Commbox.Open())
                     {
                         throw new IOException(Database.GetText("Open Commbox Fail", "System"));
                     }
                     protocol = new Synerject(Diag.BoxFactory.Instance.Commbox);
+                    PreparePage();
                     ((Synerject)protocol).Active(Manager.LiveDataVector, Database.GetText("Injector", "System"));
                 }).ContinueWith(ShowResult);
             };
@@ -72,6 +72,33 @@ namespace JM.QingQi.AndroidUI
             {
                 positionBtn.Text = Database.GetText("Ignition Coil On Test", "QingQi");
                 negativeBtn.Text = Database.GetText("Ignition Coil Off Test", "QingQi");
+                StringBuilder text = new StringBuilder(40);
+#if TOMIC_ANDROID
+                string temp = Database.GetText("Ignition Coil Notice", "QingQi");
+                if (temp.Length > 18)
+                {
+                    for (int i = 0; i < temp.Length; )
+                    {
+                        if (i + 18 > temp.Length)
+                        {
+                            text.Append(StaticString.beforeBlank + temp.Substring(i) + "\n");
+                        }
+                        else
+                        {
+                            text.Append(StaticString.beforeBlank + temp.Substring(i, 18) + "\n");
+                        }
+                        i += 18;
+                    }
+                }
+                else
+                {
+                    text.Append(StaticString.beforeBlank + temp);
+                }
+
+#else
+                text.Append(StaticString.beforeBlank + Database.GetText("Injector Notice", "QingQi");
+#endif
+                noticeText.Text = text.ToString();
 
                 task = Task.Factory.StartNew(() =>
                 {
@@ -85,13 +112,13 @@ namespace JM.QingQi.AndroidUI
                             v.Showed = true;
                         }
                     }
-                    PreparePage();
 
                     if (!Manager.Commbox.Close() || !Manager.Commbox.Open())
                     {
                         throw new IOException(Database.GetText("Open Commbox Fail", "System"));
                     }
                     protocol = new Synerject(Diag.BoxFactory.Instance.Commbox);
+                    PreparePage();
                     ((Synerject)protocol).Active(Manager.LiveDataVector, Database.GetText("Ignition Coil", "System"));
                 }).ContinueWith(ShowResult);
             };
@@ -100,6 +127,33 @@ namespace JM.QingQi.AndroidUI
             {
                 positionBtn.Text = Database.GetText("Fuel Pump On Test", "QingQi");
                 negativeBtn.Text = Database.GetText("Fuel Pump Off Test", "QingQi");
+                StringBuilder text = new StringBuilder(40);
+#if TOMIC_ANDROID
+                string temp = Database.GetText("Fuel Pump Notice", "QingQi");
+                if (temp.Length > 18)
+                {
+                    for (int i = 0; i < temp.Length; )
+                    {
+                        if (i + 18 > temp.Length)
+                        {
+                            text.Append(StaticString.beforeBlank + temp.Substring(i) + "\n");
+                        }
+                        else
+                        {
+                            text.Append(StaticString.beforeBlank + temp.Substring(i, 18) + "\n");
+                        }
+                        i += 18;
+                    }
+                }
+                else
+                {
+                    text.Append(StaticString.beforeBlank + temp);
+                }
+
+#else
+                text.Append(StaticString.beforeBlank + Database.GetText("Injector Notice", "QingQi");
+#endif
+                noticeText.Text = text.ToString();
 
                 task = Task.Factory.StartNew(() =>
                 {
@@ -111,12 +165,13 @@ namespace JM.QingQi.AndroidUI
                             v.Showed = true;
                         }
                     }
-                    PreparePage();
+                    
                     if (!Manager.Commbox.Close() || !Manager.Commbox.Open())
                     {
                         throw new IOException(Database.GetText("Open Commbox Fail", "System"));
                     }
                     protocol = new Synerject(Diag.BoxFactory.Instance.Commbox);
+                    PreparePage();
                     ((Synerject)protocol).Active(Manager.LiveDataVector, Database.GetText("Fuel Pump", "System"));
                 }).ContinueWith(ShowResult);
             };
@@ -130,7 +185,7 @@ namespace JM.QingQi.AndroidUI
             Window.SetFlags(WindowManagerFlags.KeepScreenOn, WindowManagerFlags.KeepScreenOn);
             SetContentView(Resource.Layout.ActiveTest);
 
-            layout = FindViewById<TableLayout>(Resource.Id.activeTestLayout);
+            noticeText = FindViewById<TextView>(Resource.Id.noticeText);
             positionBtn = FindViewById<Button>(Resource.Id.buttonPositive);
             positionBtn.Click += (sender, e) => 
             {
@@ -149,8 +204,6 @@ namespace JM.QingQi.AndroidUI
         protected override void OnStart()
         {
             base.OnStart();
-
-            layout.RemoveAllViews();
             model = Intent.Extras.GetString("Model");
             sub = Intent.Extras.GetString("Sub");
             protocolFuncs[model]();
@@ -169,16 +222,16 @@ namespace JM.QingQi.AndroidUI
 
         private void OnValueChange(Core.LiveData ld)
         {
-            RunOnUiThread(() => 
-            {
-                Core.LiveDataVector vec = Manager.LiveDataVector;
-                int position = vec.ShowedPosition(ld.Position);
+            //RunOnUiThread(() => 
+            //{
+            //    Core.LiveDataVector vec = Manager.LiveDataVector;
+            //    int position = vec.ShowedPosition(ld.Position);
 
-                TableRow row = (TableRow)layout.GetChildAt(position);
+            //    TableRow row = (TableRow)layout.GetChildAt(position);
 
-                TextView v = (TextView)row.GetChildAt(1);
-                v.Text = ld.Value;
-            });
+            //    TextView v = (TextView)row.GetChildAt(1);
+            //    v.Text = ld.Value;
+            //});
         }
 
         private void PreparePage()
@@ -188,28 +241,28 @@ namespace JM.QingQi.AndroidUI
             Core.LiveDataVector vec = Manager.LiveDataVector;
             RunOnUiThread(() => 
             {
-                for (int i = 0; i < vec.ShowedCount; ++i)
-                {
-                    TextView content = new TextView(this);
-                    content.Text = StaticString.beforeBlank + vec[vec.ShowedIndex(i)].Content;
-                    TextView unit = new TextView(this);
-                    unit.Text = vec[vec.ShowedIndex(i)].Unit;
-                    TextView value = new TextView(this);
-                    value.Text = vec[vec.ShowedIndex(i)].Value;
-                    TableRow row = new TableRow(this);
-                    row.AddView(content);
-                    row.AddView(value);
-                    row.AddView(unit);
-                    layout.AddView(row);
+                //for (int i = 0; i < vec.ShowedCount; ++i)
+                //{
+                //    TextView content = new TextView(this);
+                //    content.Text = StaticString.beforeBlank + vec[vec.ShowedIndex(i)].Content;
+                //    TextView unit = new TextView(this);
+                //    unit.Text = vec[vec.ShowedIndex(i)].Unit;
+                //    TextView value = new TextView(this);
+                //    value.Text = vec[vec.ShowedIndex(i)].Value;
+                //    TableRow row = new TableRow(this);
+                //    row.AddView(content);
+                //    row.AddView(value);
+                //    row.AddView(unit);
+                //    layout.AddView(row);
 
-                    vec[vec.ShowedIndex(i)].PropertyChanged += (sender, e) =>
-                    {
-                        if (e.PropertyName == "Value")
-                        {
-                            OnValueChange((Core.LiveData)sender);
-                        }
-                    };
-                }
+                //    vec[vec.ShowedIndex(i)].PropertyChanged += (sender, e) =>
+                //    {
+                //        if (e.PropertyName == "Value")
+                //        {
+                //            OnValueChange((Core.LiveData)sender);
+                //        }
+                //    };
+                //}
                 status.Dismiss();
             });
         }
@@ -217,7 +270,7 @@ namespace JM.QingQi.AndroidUI
         private void OnSynerject()
         {
             status = DialogManager.ShowStatus(this, Database.GetText("Communicating", "System"));
-            Manager.LiveDataVector = Database.GetLiveData("Synerject");
+            Manager.LiveDataVector = Database.GetLiveData(model);
             foreach (var v in Manager.LiveDataVector)
             {
                 v.Enabled = false;

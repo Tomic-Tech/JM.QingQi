@@ -186,15 +186,15 @@ namespace JM.QingQi.AndroidUI
                         {
 							if (model == (Database.GetText("QM200GY-F", "QingQi")))
 							{
-                                text = "M16-01\n";
+                                text = "M16-02\n";
                             }
                             else if (model == (Database.GetText("QM200J-3L", "QingQi")))
 							{
-                                text = "M16-00\n";
+                                text = "M16-01\n";
 							}
                             else if (model == (Database.GetText("QM200-3D", "QingQi")))
 							{
-                                text = "M16-02\n";
+                                text = "M16-03\n";
 							}
                             text += version.Hardware + "\nV" + version.Software;
                             fatal = DialogManager.ShowFatal(this, text, null);
